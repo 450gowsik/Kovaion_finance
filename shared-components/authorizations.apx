@@ -1,0 +1,33 @@
+authorization IS_ADMIN (
+    name: IS_ADMIN
+    type: plSqlFunctionBody
+    settings {
+        plsqlFunctionBody: return apex_acl.has_user_role(p_role_static_id => 'ADMIN');
+    }
+    error {
+        errorMessage: Insufficient privileges, user is not an Administrator
+    }
+)
+
+authorization IS_MANAGER (
+    name: IS_MANAGER
+    type: plSqlFunctionBody
+    settings {
+        plsqlFunctionBody: return apex_acl.has_user_role(p_role_static_id => 'MANAGER');
+    }
+    error {
+        errorMessage: Insufficient privileges, user is not a Manager
+    }
+)
+
+authorization IS_USER (
+    name: IS_USER
+    type: plSqlFunctionBody
+    settings {
+        plsqlFunctionBody: return true;
+    }
+    error {
+        errorMessage: Insufficient privileges, user is not authorized
+    }
+)
+

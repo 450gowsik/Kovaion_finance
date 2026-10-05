@@ -1,0 +1,194 @@
+page 51 (
+    name: Create Payment
+    alias: CREATE-PAYMENT
+    title: Create Payment
+    appearance {
+        pageMode: modalDialog
+        dialogTemplate: @/modal-dialog
+    }
+    dialog {
+        chained: false
+    }
+
+    region buttons (
+        name: Buttons
+        type: staticContent
+        layout {
+            sequence: 20
+            slot: dialogFooter
+        }
+        appearance {
+            template: @/buttons-container
+            templateOptions: #DEFAULT#
+        }
+    )
+
+    region payment-form (
+        name: Payment Details
+        type: staticContent
+        layout {
+            sequence: 10
+            slot: contentBody
+        }
+        appearance {
+            template: @/standard
+            templateOptions: #DEFAULT#
+        }
+    )
+
+    pageItem P51_INVOICE_ID (
+        type: numberField
+        label {
+            label: Invoice ID
+        }
+        layout {
+            sequence: 10
+            region: @payment-form
+            slot: regionBody
+        }
+        appearance {
+            template: @/optional-floating
+            templateOptions: #DEFAULT#
+        }
+    )
+
+    pageItem P51_PAYMENT_AMOUNT (
+        type: numberField
+        label {
+            label: Payment Amount
+        }
+        layout {
+            sequence: 20
+            region: @payment-form
+            slot: regionBody
+        }
+        appearance {
+            template: @/optional-floating
+            templateOptions: #DEFAULT#
+        }
+    )
+
+    pageItem P51_PAYMENT_METHOD (
+        type: selectList
+        label {
+            label: Payment Method
+        }
+        lov {
+            type: sharedComponent
+            lov: @lov-payment-methods
+        }
+        layout {
+            sequence: 30
+            region: @payment-form
+            slot: regionBody
+        }
+        appearance {
+            template: @/optional-floating
+            templateOptions: #DEFAULT#
+        }
+    )
+
+    pageItem P51_REFERENCE_NUMBER (
+        type: textField
+        label {
+            label: Reference Number
+        }
+        layout {
+            sequence: 40
+            region: @payment-form
+            slot: regionBody
+        }
+        appearance {
+            template: @/optional-floating
+            templateOptions: #DEFAULT#
+        }
+    )
+
+    button cancel (
+        buttonName: CANCEL
+        label: Cancel
+        layout {
+            sequence: 10
+            region: @buttons
+            slot: close
+        }
+        appearance {
+            buttonTemplate: @/text
+            templateOptions: #DEFAULT#
+        }
+        behavior {
+            action: triggerAction
+        }
+
+        triggerAction native-dialog-cancel (
+            action: cancelDialog
+            execution {
+                sequence: 10
+            }
+        )
+
+    )
+
+    button create-btn (
+        buttonName: CREATE
+        label: Create Payment
+        layout {
+            sequence: 20
+            region: @buttons
+            slot: next
+        }
+        appearance {
+            buttonTemplate: @/text
+            hot: true
+            templateOptions: #DEFAULT#
+        }
+        behavior {
+            action: submitPage
+        }
+    )
+
+    process process-payment (
+        name: Create Payment API
+        type: executeCode
+        source {
+            plsqlCode:
+                ```plsql
+                BEGIN
+                    KF_PKG_PAYMENT.CREATE_PAYMENT(
+                        P_INVOICE_ID         => :P51_INVOICE_ID,
+                        P_PAYMENT_AMOUNT     => :P51_PAYMENT_AMOUNT,
+                        P_PAYMENT_METHOD     => :P51_PAYMENT_METHOD,
+                        P_REFERENCE_NUMBER   => :P51_REFERENCE_NUMBER,
+                        P_CREATED_BY_USER_ID => :G_USER_ID
+                    );
+                END;
+                ```
+        }
+        execution {
+            sequence: 10
+        }
+        advanced {
+            executionMappingIdentifier: 10051001
+        }
+        serverSideCondition {
+            type: requestIsContainedInValue
+            value: CREATE
+        }
+    )
+
+    process close-dialog (
+        name: Close Dialog
+        type: closeDialog
+        execution {
+            sequence: 50
+        }
+        advanced {
+            executionMappingIdentifier: 10051002
+        }
+        serverSideCondition {
+            type: requestIsContainedInValue
+            value: CREATE
+        }
+    )
+
+)

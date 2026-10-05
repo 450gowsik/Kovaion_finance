@@ -1,0 +1,394 @@
+page 50 (
+    name: Payments
+    alias: PAYMENTS
+    title: "Payments & Transactions - Kovaion Finance"
+    appearance {
+        pageMode: normal
+        pageTemplate: @/standard
+        templateOptions: #DEFAULT#
+    }
+    navigation {
+        cursorFocus: doNotFocusCursor
+    }
+    css {
+        inline:
+            ```css
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap');
+
+            .pingwi-transactions-page {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                color: #0f172a;
+                background-color: #f8fafc;
+                margin: -16px;
+                padding: 24px;
+            }
+
+            /* Header Section */
+            .pw-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 16px;
+                margin-bottom: 24px;
+            }
+            .pw-title-area h1 {
+                font-size: 24px;
+                font-weight: 800;
+                color: #0f172a;
+                letter-spacing: -0.02em;
+                margin: 0 0 6px 0;
+            }
+            .pw-subtitle {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 13px;
+                color: #64748b;
+            }
+            .pw-pulse-dot {
+                width: 8px;
+                height: 8px;
+                background-color: #10b981;
+                border-radius: 50%;
+                box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+            }
+
+            /* 4 Quick Transaction Stats Cards */
+            .pw-stats-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 16px;
+                margin-bottom: 20px;
+            }
+            @media (max-width: 1024px) {
+                .pw-stats-grid { grid-template-columns: repeat(2, 1fr); }
+            }
+            @media (max-width: 640px) {
+                .pw-stats-grid { grid-template-columns: 1fr; }
+            }
+
+            .pw-stat-card {
+                background: #ffffff;
+                border: 1px solid #f1f5f9;
+                border-radius: 14px;
+                padding: 16px 20px;
+                box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+            }
+            .pw-stat-label {
+                font-size: 12px;
+                font-weight: 600;
+                color: #64748b;
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+                margin-bottom: 4px;
+            }
+            .pw-stat-val {
+                font-size: 22px;
+                font-weight: 800;
+                color: #0f172a;
+            }
+            .pw-stat-badge {
+                display: inline-block;
+                margin-top: 6px;
+                font-size: 11px;
+                font-weight: 700;
+                padding: 2px 8px;
+                border-radius: 6px;
+            }
+            .pw-badge-green { background: #dcfce7; color: #15803d; }
+            .pw-badge-blue { background: #e0f2fe; color: #0369a1; }
+            .pw-badge-amber { background: #fef3c7; color: #b45309; }
+            .pw-badge-slate { background: #f1f5f9; color: #475569; }
+
+            /* Filter Bar (Pingwi style) */
+            .pw-filter-bar {
+                background: #ffffff;
+                border: 1px solid #f1f5f9;
+                border-radius: 12px;
+                padding: 10px 16px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                flex-wrap: wrap;
+                margin-bottom: 16px;
+                box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+            }
+            .pw-filter-tag {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 6px 12px;
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+                font-size: 12px;
+                font-weight: 600;
+                color: #475569;
+                cursor: pointer;
+            }
+            .pw-filter-tag:hover {
+                background: #f1f5f9;
+                color: #0f172a;
+            }
+            .pw-filter-tag strong {
+                color: #0f172a;
+            }
+
+            /* APEX Interactive Report Styling (Pingwi Style) */
+            .t-Region--interactiveReport {
+                border-radius: 16px !important;
+                border: 1px solid #e2e8f0 !important;
+                box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.04) !important;
+                overflow: hidden !important;
+                background: #ffffff !important;
+            }
+            .t-Region-header {
+                background: #ffffff !important;
+                border-bottom: 1px solid #f1f5f9 !important;
+                padding: 16px 20px !important;
+            }
+            .t-Region-title {
+                font-size: 16px !important;
+                font-weight: 700 !important;
+                color: #0f172a !important;
+            }
+            .a-IRR-toolbar {
+                background: #ffffff !important;
+                border-bottom: 1px solid #f1f5f9 !important;
+                padding: 10px 18px !important;
+            }
+            .a-IRR-table {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 13px !important;
+            }
+            .a-IRR-header {
+                background: #f8fafc !important;
+                color: #64748b !important;
+                font-size: 11px !important;
+                font-weight: 700 !important;
+                text-transform: uppercase !important;
+                letter-spacing: 0.05em !important;
+                border-bottom: 1px solid #e2e8f0 !important;
+                padding: 12px 16px !important;
+            }
+            .a-IRR-dataRow td {
+                padding: 12px 16px !important;
+                border-bottom: 1px solid #f8fafc !important;
+                vertical-align: middle !important;
+                color: #334155 !important;
+            }
+            .a-IRR-dataRow:hover td {
+                background-color: #f8fafc !important;
+            }
+
+            /* Pingwi Hot Button */
+            .t-Button--hot {
+                background-color: #4f46e5 !important;
+                border-color: #4f46e5 !important;
+                color: #ffffff !important;
+                font-weight: 600 !important;
+                border-radius: 8px !important;
+                padding: 8px 16px !important;
+                box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25) !important;
+                transition: all 0.15s ease !important;
+            }
+            .t-Button--hot:hover {
+                background-color: #4338ca !important;
+                transform: translateY(-1px) !important;
+                box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35) !important;
+            }
+
+            /* Pingwi Transaction Status Badges */
+            .pw-status-approved {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                padding: 4px 10px;
+                background-color: #dcfce7;
+                color: #15803d;
+                border: 1px solid #bbf7d0;
+                border-radius: 9999px;
+                font-size: 11px;
+                font-weight: 700;
+            }
+            .pw-status-pending {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                padding: 4px 10px;
+                background-color: #e0f2fe;
+                color: #0369a1;
+                border: 1px solid #bae6fd;
+                border-radius: 9999px;
+                font-size: 11px;
+                font-weight: 700;
+            }
+            .pw-status-waiting {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                padding: 4px 10px;
+                background-color: #fef9c3;
+                color: #a16207;
+                border: 1px solid #fef08a;
+                border-radius: 9999px;
+                font-size: 11px;
+                font-weight: 700;
+            }
+            .pw-status-error {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                padding: 4px 10px;
+                background-color: #fee2e2;
+                color: #b91c1c;
+                border: 1px solid #fecaca;
+                border-radius: 9999px;
+                font-size: 11px;
+                font-weight: 700;
+            }
+            ```
+    }
+    javaScript {
+        executeWhenPageLoads:
+            ```javascript
+            (function () {
+                "use strict";
+                function formatPingwiBadges() {
+                    document.querySelectorAll('.a-IRR-table td').forEach(td => {
+                        const txt = td.textContent.trim().toUpperCase();
+                        if ((txt === 'COMPLETED' || txt === 'APPROVED' || txt === 'PAID') && !td.querySelector('.pw-status-approved')) {
+                            td.innerHTML = '<span class="pw-status-approved">Approved</span>';
+                        } else if ((txt === 'PENDING' || txt === 'SUBMITTED') && !td.querySelector('.pw-status-pending')) {
+                            td.innerHTML = '<span class="pw-status-pending">Pending</span>';
+                        } else if ((txt === 'WAITING' || txt === 'PROCESSING') && !td.querySelector('.pw-status-waiting')) {
+                            td.innerHTML = '<span class="pw-status-waiting">Waiting</span>';
+                        } else if ((txt === 'FAILED' || txt === 'REJECTED' || txt === 'DECLINED' || txt === 'ERROR') && !td.querySelector('.pw-status-error')) {
+                            td.innerHTML = '<span class="pw-status-error">Declined</span>';
+                        }
+                    });
+                }
+                formatPingwiBadges();
+            })();
+            ```
+    }
+
+    region payment-overview (
+        name: "Payment Statistics"
+        type: staticContent
+        source {
+            htmlCode:
+                ```html
+                <div class="pingwi-transactions-page">
+                    <!-- Pingwi Header -->
+                    <div class="pw-header">
+                        <div class="pw-title-area">
+                            <h1>Payments &amp; Transactions</h1>
+                            <div class="pw-subtitle">
+                                <span class="pw-pulse-dot"></span>
+                                <span>Real-time payment gateway settlements &bull; Last updated 2 min ago</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4 Quick Stats Cards -->
+                    <div class="pw-stats-grid">
+                        <div class="pw-stat-card">
+                            <div class="pw-stat-label">Total Disbursed</div>
+                            <div class="pw-stat-val">₹1,42,80,000</div>
+                            <span class="pw-stat-badge pw-badge-green">&uarr; 94.2% Settlement Rate</span>
+                        </div>
+                        <div class="pw-stat-card">
+                            <div class="pw-stat-label">Pending Approval</div>
+                            <div class="pw-stat-val">₹21,50,000</div>
+                            <span class="pw-stat-badge pw-badge-amber">12 batches awaiting</span>
+                        </div>
+                        <div class="pw-stat-card">
+                            <div class="pw-stat-label">In Transit</div>
+                            <div class="pw-stat-val">₹8,40,000</div>
+                            <span class="pw-stat-badge pw-badge-blue">Processing bank RTGS</span>
+                        </div>
+                        <div class="pw-stat-card">
+                            <div class="pw-stat-label">Failed / Chargebacks</div>
+                            <div class="pw-stat-val">₹0.00</div>
+                            <span class="pw-stat-badge pw-badge-slate">0 incidents recorded</span>
+                        </div>
+                    </div>
+
+                    <!-- Pingwi Filter Chips -->
+                    <div class="pw-filter-bar">
+                        <div class="pw-filter-tag">Payment Method: <strong>All</strong> &#9662;</div>
+                        <div class="pw-filter-tag">Gateway: <strong>All</strong> &#9662;</div>
+                        <div class="pw-filter-tag">Operation: <strong>Disbursement</strong> &#9662;</div>
+                        <div class="pw-filter-tag">Status: <strong>All</strong> &#9662;</div>
+                        <div class="pw-filter-tag">Date Range: <strong>Current FY (2026-27)</strong></div>
+                    </div>
+                </div>
+                ```
+        }
+        layout {
+            sequence: 5
+            slot: body
+        }
+        appearance {
+            template: @/blank-with-attributes
+            templateOptions: #DEFAULT#
+        }
+    )
+
+    region payments-list (
+        name: "Transactions Register"
+        type: interactiveReport
+        source {
+            location: localDatabase
+            type: sqlQuery
+            sqlQuery:
+                ```sql
+                SELECT * FROM KF_VW_PAYMENT_SUMMARY
+                ```
+        }
+        layout {
+            sequence: 10
+            slot: body
+        }
+        appearance {
+            template: @/interactive-report
+            templateOptions: #DEFAULT#
+        }
+        advanced {
+            savedReportMappingIdentifier: 10050001
+        }
+
+        savedReport primary (
+            visibility: primaryDefault
+            view {
+                rowsPerPage: 50
+            }
+        )
+
+    )
+
+    button create-payment (
+        buttonName: CREATE_PAYMENT
+        label: "+ Record Payment"
+        layout {
+            sequence: 10
+            region: @payments-list
+            slot: rightOfInteractiveReportSearchBar
+        }
+        appearance {
+            buttonTemplate: @/text
+            hot: true
+            templateOptions: #DEFAULT#
+        }
+        behavior {
+            action: redirectThisApp
+            target: {
+                page: 51
+                clearCache: 51
+            }
+        }
+    )
+
+)

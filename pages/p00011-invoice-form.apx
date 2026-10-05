@@ -1,0 +1,278 @@
+page 11 (
+    name: Invoice Form
+    alias: INVOICE-FORM
+    title: Invoice Form
+    appearance {
+        pageMode: modalDialog
+        dialogTemplate: @/drawer
+    }
+    dialog {
+        chained: false
+    }
+
+    region buttons (
+        name: Buttons
+        type: staticContent
+        layout {
+            sequence: 20
+            slot: dialogFooter
+        }
+        appearance {
+            template: @/buttons-container
+            templateOptions: #DEFAULT#
+        }
+    )
+
+    region invoice-form (
+        name: Invoice Form
+        type: form
+        source {
+            location: localDatabase
+            tableName: KF_INVOICES
+        }
+        layout {
+            sequence: 10
+            slot: contentBody
+        }
+        appearance {
+            template: @/blank-with-attributes
+            templateOptions: #DEFAULT#
+        }
+        edit {
+            enabled: true
+            allowedOperations: [
+                add
+                update
+                delete
+            ]
+        }
+    )
+
+    pageItem P11_INVOICE_ID (
+        type: hidden
+        layout {
+            sequence: 10
+            region: @invoice-form
+            slot: regionBody
+        }
+        source {
+            formRegion: @invoice-form
+            column: INVOICE_ID
+            dataType: number
+            primaryKey: true
+        }
+    )
+
+    pageItem P11_INVOICE_NUMBER (
+        type: textField
+        label {
+            label: Invoice Number
+        }
+        layout {
+            sequence: 20
+            region: @invoice-form
+            slot: regionBody
+        }
+        appearance {
+            template: @/required-floating
+            templateOptions: #DEFAULT#
+        }
+        validation {
+            valueRequired: true
+        }
+        source {
+            formRegion: @invoice-form
+            column: INVOICE_NUMBER
+            dataType: varchar2
+        }
+    )
+
+    pageItem P11_VENDOR_ID (
+        type: selectList
+        label {
+            label: Vendor
+        }
+        lov {
+            type: sharedComponent
+            lov: @lov-vendors
+        }
+        layout {
+            sequence: 30
+            region: @invoice-form
+            slot: regionBody
+        }
+        appearance {
+            template: @/required-floating
+            templateOptions: #DEFAULT#
+        }
+        validation {
+            valueRequired: true
+        }
+        source {
+            formRegion: @invoice-form
+            column: VENDOR_ID
+            dataType: number
+        }
+    )
+
+    pageItem P11_INVOICE_DATE (
+        type: datePicker
+        label {
+            label: Invoice Date
+        }
+        layout {
+            sequence: 40
+            region: @invoice-form
+            slot: regionBody
+        }
+        appearance {
+            template: @/required-floating
+            templateOptions: #DEFAULT#
+        }
+        validation {
+            valueRequired: true
+        }
+        source {
+            formRegion: @invoice-form
+            column: INVOICE_DATE
+            dataType: date
+        }
+    )
+
+    pageItem P11_TOTAL_AMOUNT (
+        type: numberField
+        label {
+            label: Total Amount
+        }
+        layout {
+            sequence: 50
+            region: @invoice-form
+            slot: regionBody
+        }
+        appearance {
+            template: @/required-floating
+            templateOptions: #DEFAULT#
+        }
+        validation {
+            valueRequired: true
+        }
+        source {
+            formRegion: @invoice-form
+            column: TOTAL_AMOUNT
+            dataType: number
+        }
+    )
+
+    button cancel (
+        buttonName: CANCEL
+        label: Cancel
+        layout {
+            sequence: 10
+            region: @buttons
+            slot: close
+        }
+        appearance {
+            buttonTemplate: @/text
+            templateOptions: #DEFAULT#
+        }
+        behavior {
+            action: triggerAction
+        }
+
+        triggerAction native-dialog-cancel (
+            action: cancelDialog
+            execution {
+                sequence: 10
+            }
+        )
+
+    )
+
+    button save (
+        buttonName: SAVE
+        label: Apply Changes
+        layout {
+            sequence: 30
+            region: @buttons
+            slot: next
+        }
+        appearance {
+            buttonTemplate: @/text
+            hot: true
+            templateOptions: #DEFAULT#
+        }
+        behavior {
+            warnOnUnsavedChanges: doNotCheck
+            databaseAction: update
+        }
+        serverSideCondition {
+            type: itemIsNotNull
+            item: P11_INVOICE_ID
+        }
+    )
+
+    button create (
+        buttonName: CREATE
+        label: Create
+        layout {
+            sequence: 40
+            region: @buttons
+            slot: next
+        }
+        appearance {
+            buttonTemplate: @/text
+            hot: true
+            templateOptions: #DEFAULT#
+        }
+        behavior {
+            warnOnUnsavedChanges: doNotCheck
+            databaseAction: insert
+        }
+        serverSideCondition {
+            type: itemIsNull
+            item: P11_INVOICE_ID
+        }
+    )
+
+    process initialize-form-invoice (
+        name: Initialize form Invoice
+        type: formInitialization
+        formRegion: @invoice-form
+        execution {
+            sequence: 10
+            point: beforeHeader
+        }
+        advanced {
+            executionMappingIdentifier: 10011001
+        }
+    )
+
+    process process-form-invoice (
+        name: Process form Invoice
+        type: formAutoRowProcessing
+        formRegion: @invoice-form
+        execution {
+            sequence: 10
+        }
+        advanced {
+            executionMappingIdentifier: 10011002
+        }
+    )
+
+    process close-dialog (
+        name: Close Dialog
+        type: closeDialog
+        execution {
+            sequence: 50
+        }
+        advanced {
+            executionMappingIdentifier: 10011003
+        }
+        serverSideCondition {
+            type: requestIsContainedInValue
+            value: CREATE,SAVE,DELETE
+        }
+    )
+
+)
+

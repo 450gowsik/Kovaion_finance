@@ -1,0 +1,47 @@
+lov lov-fiscal-years (
+    name: LOV_FISCAL_YEARS
+    source {
+        tableName: KF_FISCAL_YEARS
+    }
+    columnMapping {
+        return: FISCAL_YEAR_ID
+        display: FISCAL_YEAR_CODE
+        defaultSort: FISCAL_YEAR_CODE
+    }
+)
+
+lov lov-invoice-status (
+    name: LOV_INVOICE_STATUS
+    source {
+        tableName: KF_INVOICE_STATUS_LOV
+    }
+    columnMapping {
+        return: STATUS_CODE
+        display: STATUS_NAME
+        defaultSort: STATUS_NAME
+    }
+)
+
+lov lov-payment-methods (
+    name: LOV_PAYMENT_METHODS
+    source {
+        tableName: KF_PAYMENT_METHODS_LOV
+    }
+    columnMapping {
+        return: METHOD_CODE
+        display: METHOD_NAME
+        defaultSort: METHOD_NAME
+    }
+)
+
+lov lov-vendors (
+    name: LOV_VENDORS
+    source {
+        tableName: KF_VENDORS
+    }
+    columnMapping {
+        return: VENDOR_ID
+        display: VENDOR_NAME
+        defaultSort: VENDOR_NAME
+    }
+)

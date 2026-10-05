@@ -1,0 +1,19 @@
+# Operating System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary and log files
+*.tmp
+*.log
+*.bak
+*.class
+
+# Python cache & virtual environments
+__pycache__/
+*.py[cod]
+venv/
+.env
+
+# Scratch and intermediate outputs
+scratch/

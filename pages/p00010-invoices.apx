@@ -1,0 +1,688 @@
+page 10 (
+    name: Invoices
+    alias: INVOICES
+    title: "Invoices - Kovaion Finance"
+    appearance {
+        pageMode: normal
+        pageTemplate: @/standard
+        templateOptions: #DEFAULT#
+    }
+    navigation {
+        cursorFocus: doNotFocusCursor
+    }
+    css {
+        inline:
+            ```css
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+            .kanakku-invoices-page {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                color: #0f172a;
+                background-color: #f8fafc;
+                margin: -16px;
+                padding: 24px;
+            }
+
+            /* Breadcrumb & Subheader */
+            .knk-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 16px;
+                margin-bottom: 24px;
+            }
+            .knk-breadcrumb {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 13px;
+                color: #64748b;
+                margin-bottom: 6px;
+            }
+            .knk-breadcrumb a {
+                color: #64748b;
+                text-decoration: none;
+                transition: color 0.15s ease;
+            }
+            .knk-breadcrumb a:hover {
+                color: #4f46e5;
+            }
+            .knk-breadcrumb span.sep {
+                color: #cbd5e1;
+            }
+            .knk-breadcrumb span.current {
+                color: #0f172a;
+                font-weight: 600;
+            }
+            .knk-title-area h1 {
+                font-size: 24px;
+                font-weight: 800;
+                color: #0f172a;
+                letter-spacing: -0.02em;
+                margin: 0;
+            }
+
+            /* KPI Summary Cards Grid */
+            .knk-kpi-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 20px;
+                margin-bottom: 24px;
+            }
+            @media (max-width: 1200px) {
+                .knk-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+            }
+            @media (max-width: 640px) {
+                .knk-kpi-grid { grid-template-columns: 1fr; }
+            }
+
+            .knk-kpi-card {
+                position: relative;
+                background: #ffffff;
+                border: 1px solid #f1f5f9;
+                border-radius: 18px;
+                padding: 22px 24px;
+                box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+                overflow: hidden;
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+            }
+            .knk-kpi-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 12px 28px -4px rgba(15, 23, 42, 0.09);
+            }
+
+            .knk-kpi-top {
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+                margin-bottom: 12px;
+            }
+            .knk-kpi-label {
+                font-size: 13px;
+                font-weight: 600;
+                color: #64748b;
+                letter-spacing: 0.01em;
+            }
+            .knk-kpi-val {
+                font-size: 26px;
+                font-weight: 800;
+                color: #0f172a;
+                letter-spacing: -0.02em;
+                margin-top: 4px;
+            }
+            .knk-kpi-icon {
+                width: 48px;
+                height: 48px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+            }
+            .knk-kpi-icon.purple { background: #f5f3ff; color: #7c3aed; }
+            .knk-kpi-icon.green { background: #ecfdf5; color: #10b981; }
+            .knk-kpi-icon.amber { background: #fffbeb; color: #f59e0b; }
+            .knk-kpi-icon.red { background: #fef2f2; color: #ef4444; }
+
+            .knk-kpi-trend {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                font-size: 12px;
+                font-weight: 600;
+                margin-top: 10px;
+            }
+            .knk-kpi-trend.up { color: #10b981; }
+            .knk-kpi-trend.down { color: #ef4444; }
+            .knk-kpi-trend span.period {
+                color: #94a3b8;
+                font-weight: 500;
+            }
+
+            /* Decorative Background Wave */
+            .knk-card-wave {
+                position: absolute;
+                bottom: 0;
+                right: 0;
+                width: 110px;
+                height: 55px;
+                opacity: 0.12;
+                pointer-events: none;
+            }
+
+            /* Filter Pills Bar */
+            .knk-filter-bar {
+                background: #ffffff;
+                border: 1px solid #f1f5f9;
+                border-radius: 14px;
+                padding: 12px 18px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 12px;
+                margin-bottom: 20px;
+                box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+            }
+            .knk-pills {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                overflow-x: auto;
+            }
+            .knk-pill {
+                background: none;
+                border: none;
+                padding: 7px 16px;
+                font-size: 13px;
+                font-weight: 600;
+                color: #64748b;
+                border-radius: 20px;
+                cursor: pointer;
+                transition: all 0.15s ease;
+                white-space: nowrap;
+            }
+            .knk-pill:hover {
+                color: #0f172a;
+                background-color: #f1f5f9;
+            }
+            .knk-pill.active {
+                background-color: #7c3aed;
+                color: #ffffff;
+                box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
+            }
+
+            /* Override APEX Interactive Report UI */
+            .t-Region--interactiveReport {
+                border-radius: 18px !important;
+                border: 1px solid #e2e8f0 !important;
+                box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04) !important;
+                overflow: hidden !important;
+                background: #ffffff !important;
+            }
+            .t-Region-header {
+                background: #ffffff !important;
+                border-bottom: 1px solid #f1f5f9 !important;
+                padding: 16px 24px !important;
+            }
+            .t-Region-title {
+                font-size: 17px !important;
+                font-weight: 700 !important;
+                color: #0f172a !important;
+            }
+            .a-IRR-toolbar {
+                background: #ffffff !important;
+                border-bottom: 1px solid #f1f5f9 !important;
+                padding: 12px 20px !important;
+            }
+            .a-IRR-table {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 13px !important;
+            }
+            .a-IRR-header {
+                background: #f8fafc !important;
+                color: #64748b !important;
+                font-size: 11px !important;
+                font-weight: 700 !important;
+                text-transform: uppercase !important;
+                letter-spacing: 0.05em !important;
+                border-bottom: 1px solid #e2e8f0 !important;
+                padding: 14px 16px !important;
+            }
+            .a-IRR-dataRow td {
+                padding: 14px 16px !important;
+                border-bottom: 1px solid #f8fafc !important;
+                vertical-align: middle !important;
+                color: #334155 !important;
+            }
+            .a-IRR-dataRow:hover td {
+                background-color: #f8fafc !important;
+            }
+
+            /* Hot Button: Kanakku Purple */
+            .t-Button--hot {
+                background-color: #7c3aed !important;
+                border-color: #7c3aed !important;
+                color: #ffffff !important;
+                font-weight: 600 !important;
+                border-radius: 10px !important;
+                padding: 8px 18px !important;
+                box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3) !important;
+                transition: all 0.2s ease !important;
+            }
+            .t-Button--hot:hover {
+                background-color: #6d28d9 !important;
+                border-color: #6d28d9 !important;
+                transform: translateY(-1px) !important;
+                box-shadow: 0 6px 18px rgba(124, 58, 237, 0.4) !important;
+            }
+
+            /* Status Badges */
+            .badge-paid {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                padding: 4px 10px;
+                background-color: #ecfdf5;
+                color: #059669;
+                border: 1px solid #a7f3d0;
+                border-radius: 9999px;
+                font-size: 11px;
+                font-weight: 700;
+            }
+            .badge-overdue {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                padding: 4px 10px;
+                background-color: #fef2f2;
+                color: #dc2626;
+                border: 1px solid #fecaca;
+                border-radius: 9999px;
+                font-size: 11px;
+                font-weight: 700;
+            }
+            .badge-pending {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                padding: 4px 10px;
+                background-color: #fffbeb;
+                color: #d97706;
+                border: 1px solid #fde68a;
+                border-radius: 9999px;
+                font-size: 11px;
+                font-weight: 700;
+            }
+            .badge-draft {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                padding: 4px 10px;
+                background-color: #f1f5f9;
+                color: #64748b;
+                border: 1px solid #e2e8f0;
+                border-radius: 9999px;
+                font-size: 11px;
+                font-weight: 700;
+            }
+            .knk-row-hidden {
+                display: none !important;
+            }
+            ```
+    }
+    javaScript {
+        executeWhenPageLoads:
+            ```javascript
+            (function () {
+                "use strict";
+
+                let currentFilter = 'ALL';
+
+                // Helper to get only data rows (skipping header rows and empty-state rows)
+                function getDataRows() {
+                    const table = document.querySelector('.a-IRR-table');
+                    if (!table) return [];
+                    const trs = table.querySelectorAll('tr');
+                    const rows = [];
+                    trs.forEach(tr => {
+                        // Header row only contains <th> cells and 0 <td> cells. Data rows contain <td> cells.
+                        if (tr.querySelectorAll('td').length === 0) return;
+                        if (tr.classList.contains('a-IRR-noData') || tr.classList.contains('knk-no-match-row')) return;
+                        rows.push(tr);
+                    });
+                    return rows;
+                }
+
+                // Helper to get Status text for a row
+                function getRowStatus(tr) {
+                    const statusTd = tr.querySelector('td[headers*="STATUS"], td[headers*="status"]') ||
+                        Array.from(tr.querySelectorAll('td')).find(c => {
+                            const t = c.textContent.trim().toUpperCase();
+                            return ['PAID', 'PENDING', 'OVERDUE', 'PARTIALLY_PAID', 'PARTIALLY PAID', 'PARTIAL', 'DRAFT', 'APPROVED', 'UNPAID'].includes(t);
+                        });
+
+                    if (statusTd) {
+                        return statusTd.textContent.trim().toUpperCase();
+                    }
+                    return tr.textContent.trim().toUpperCase();
+                }
+
+                function formatTableStatuses() {
+                    const rows = getDataRows();
+                    rows.forEach(tr => {
+                        const td = tr.querySelector('td[headers*="STATUS"], td[headers*="status"]') ||
+                            Array.from(tr.querySelectorAll('td')).find(c => {
+                                const t = c.textContent.trim().toUpperCase();
+                                return ['PAID', 'PENDING', 'OVERDUE', 'PARTIALLY_PAID', 'PARTIALLY PAID', 'PARTIAL', 'DRAFT', 'APPROVED', 'UNPAID'].includes(t);
+                            });
+                        if (!td) return;
+
+                        const txt = td.textContent.trim().toUpperCase();
+
+                        if (txt.includes('PAID') && !txt.includes('PARTIAL') && !td.querySelector('.badge-paid')) {
+                            td.innerHTML = '<span class="badge-paid"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Paid</span>';
+                        } else if (txt.includes('OVERDUE') && !td.querySelector('.badge-overdue')) {
+                            td.innerHTML = '<span class="badge-overdue"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Overdue</span>';
+                        } else if ((txt.includes('PENDING') || txt.includes('APPROVED') || txt.includes('UNPAID')) && !td.querySelector('.badge-pending')) {
+                            td.innerHTML = '<span class="badge-pending"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Pending</span>';
+                        } else if (txt.includes('PARTIAL') && !td.querySelector('.badge-partial')) {
+                            td.innerHTML = '<span class="badge-pending" style="background:#e0e7ff;color:#4338ca;border:1px solid #c7d2fe;">Partially Paid</span>';
+                        } else if (txt.includes('DRAFT') && !td.querySelector('.badge-draft')) {
+                            td.innerHTML = '<span class="badge-draft">Draft</span>';
+                        }
+                    });
+                }
+
+                function applyFilter(filter) {
+                    if (filter !== undefined) currentFilter = filter;
+                    const rows = getDataRows();
+                    if (!rows.length) return;
+
+                    let matchCount = 0;
+
+                    rows.forEach(tr => {
+                        const statusTxt = getRowStatus(tr);
+                        let match = false;
+
+                        if (currentFilter === 'ALL') {
+                            match = true;
+                        } else if (currentFilter === 'PAID') {
+                            match = statusTxt.includes('PAID') && !statusTxt.includes('PARTIAL');
+                        } else if (currentFilter === 'PARTIALLY_PAID') {
+                            match = statusTxt.includes('PARTIAL');
+                        } else if (currentFilter === 'PENDING') {
+                            match = statusTxt.includes('PENDING') || statusTxt.includes('APPROVED') || statusTxt.includes('UNPAID');
+                        } else if (currentFilter === 'OVERDUE') {
+                            match = statusTxt.includes('OVERDUE');
+                        } else if (currentFilter === 'DRAFT') {
+                            match = statusTxt.includes('DRAFT');
+                        }
+
+                        if (match) {
+                            tr.classList.remove('knk-row-hidden');
+                            tr.style.setProperty('display', '', '');
+                            matchCount++;
+                        } else {
+                            tr.classList.add('knk-row-hidden');
+                            tr.style.setProperty('display', 'none', 'important');
+                        }
+                    });
+
+                    // Friendly empty message if no rows match filter on current page
+                    const tbody = document.querySelector('.a-IRR-table tbody') || document.querySelector('.a-IRR-table');
+                    let emptyRow = document.querySelector('.knk-no-match-row');
+                    if (matchCount === 0 && currentFilter !== 'ALL') {
+                        if (!emptyRow && tbody) {
+                            emptyRow = document.createElement('tr');
+                            emptyRow.className = 'knk-no-match-row';
+                            emptyRow.innerHTML = '<td colspan="25" style="text-align:center; padding:32px; color:#64748b; font-weight:500; font-size:14px; background:#f8fafc;">No invoices found with status "<strong>' + currentFilter.replace('_', ' ') + '</strong>" on this page.</td>';
+                            tbody.appendChild(emptyRow);
+                        }
+                    } else if (emptyRow) {
+                        emptyRow.remove();
+                    }
+                }
+
+                function initPills() {
+                    const pills = document.querySelectorAll('.knk-pill');
+                    pills.forEach(pill => {
+                        pill.onclick = function (e) {
+                            e.preventDefault();
+                            pills.forEach(p => p.classList.remove('active'));
+                            this.classList.add('active');
+
+                            const label = this.textContent.trim().toUpperCase();
+                            let f = 'ALL';
+                            if (label.includes('ALL')) f = 'ALL';
+                            else if (label === 'PAID') f = 'PAID';
+                            else if (label.includes('PARTIAL')) f = 'PARTIALLY_PAID';
+                            else if (label.includes('PENDING')) f = 'PENDING';
+                            else if (label.includes('OVERDUE')) f = 'OVERDUE';
+                            else if (label.includes('DRAFT')) f = 'DRAFT';
+
+                            applyFilter(f);
+                        };
+                    });
+                }
+
+                function refreshAll() {
+                    formatTableStatuses();
+                    applyFilter();
+                }
+
+                // Initial setup
+                initPills();
+                refreshAll();
+
+                // Re-apply when APEX Interactive Report is refreshed (pagination, sorting, search)
+                if (typeof apex !== 'undefined' && apex.jQuery) {
+                    apex.jQuery(document).on('apexafterrefresh', function () {
+                        setTimeout(function () {
+                            refreshAll();
+                        }, 50);
+                    });
+                }
+            })();
+            ```
+    }
+
+    region invoice-kpi-summary (
+        name: "Invoice Overview"
+        type: staticContent
+        source {
+            htmlCode:
+                ```html
+                <div class="kanakku-invoices-page">
+                    <!-- Top Breadcrumb & Header -->
+                    <div class="knk-header">
+                        <div class="knk-title-area">
+                            <div class="knk-breadcrumb">
+                                <a href="f?p=&APP_ID.:1:&APP_SESSION.">Home</a>
+                                <span class="sep">/</span>
+                                <span class="current">Invoices</span>
+                            </div>
+                            <h1>Invoices</h1>
+                        </div>
+                    </div>
+
+                    <!-- 4 Kanakku-Style KPI Summary Cards -->
+                    <div class="knk-kpi-grid">
+                        <!-- Total Invoices -->
+                        <div class="knk-kpi-card">
+                            <div class="knk-kpi-top">
+                                <div>
+                                    <div class="knk-kpi-label">Total Invoices</div>
+                                    <div class="knk-kpi-val">₹25,84,000</div>
+                                </div>
+                                <div class="knk-kpi-icon purple">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                        <polyline points="14 2 14 8 20 8"/>
+                                        <line x1="16" y1="13" x2="8" y2="13"/>
+                                        <line x1="16" y1="17" x2="8" y2="17"/>
+                                        <polyline points="10 9 9 9 8 9"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="knk-kpi-trend up">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+                                5.62% <span class="period">from last month</span>
+                            </div>
+                            <svg class="knk-card-wave" viewBox="0 0 100 40" fill="none">
+                                <path d="M0 20 Q 25 5, 50 20 T 100 20 L 100 40 L 0 40 Z" fill="#7c3aed"/>
+                            </svg>
+                        </div>
+
+                        <!-- Paid Invoices -->
+                        <div class="knk-kpi-card">
+                            <div class="knk-kpi-top">
+                                <div>
+                                    <div class="knk-kpi-label">Paid Invoices</div>
+                                    <div class="knk-kpi-val">₹18,50,000</div>
+                                </div>
+                                <div class="knk-kpi-icon green">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                        <polyline points="22 4 12 14.01 9 11.01"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="knk-kpi-trend up">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+                                11.4% <span class="period">from last month</span>
+                            </div>
+                            <svg class="knk-card-wave" viewBox="0 0 100 40" fill="none">
+                                <path d="M0 20 Q 25 5, 50 20 T 100 20 L 100 40 L 0 40 Z" fill="#10b981"/>
+                            </svg>
+                        </div>
+
+                        <!-- Pending Invoices -->
+                        <div class="knk-kpi-card">
+                            <div class="knk-kpi-top">
+                                <div>
+                                    <div class="knk-kpi-label">Pending Invoices</div>
+                                    <div class="knk-kpi-val">₹5,34,000</div>
+                                </div>
+                                <div class="knk-kpi-icon amber">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <polyline points="12 6 12 12 16 14"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="knk-kpi-trend up">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+                                8.52% <span class="period">from last month</span>
+                            </div>
+                            <svg class="knk-card-wave" viewBox="0 0 100 40" fill="none">
+                                <path d="M0 20 Q 25 5, 50 20 T 100 20 L 100 40 L 0 40 Z" fill="#f59e0b"/>
+                            </svg>
+                        </div>
+
+                        <!-- Overdue Invoices -->
+                        <div class="knk-kpi-card">
+                            <div class="knk-kpi-top">
+                                <div>
+                                    <div class="knk-kpi-label">Overdue Invoices</div>
+                                    <div class="knk-kpi-val">₹2,00,000</div>
+                                </div>
+                                <div class="knk-kpi-icon red">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <line x1="12" y1="8" x2="12" y2="12"/>
+                                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="knk-kpi-trend down">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                                7.45% <span class="period">from last month</span>
+                            </div>
+                            <svg class="knk-card-wave" viewBox="0 0 100 40" fill="none">
+                                <path d="M0 20 Q 25 5, 50 20 T 100 20 L 100 40 L 0 40 Z" fill="#ef4444"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Kanakku Filter Pills -->
+                    <div class="knk-filter-bar">
+                        <div class="knk-pills">
+                            <button type="button" class="knk-pill active">All Invoices</button>
+                            <button type="button" class="knk-pill">Paid</button>
+                            <button type="button" class="knk-pill">Pending</button>
+                            <button type="button" class="knk-pill">Overdue</button>
+                            <button type="button" class="knk-pill">Partially Paid</button>
+                            <button type="button" class="knk-pill">Draft</button>
+                        </div>
+                    </div>
+                </div>
+                ```
+        }
+        layout {
+            sequence: 5
+            slot: body
+        }
+        appearance {
+            template: @/blank-with-attributes
+            templateOptions: #DEFAULT#
+        }
+    )
+
+    region invoices (
+        name: "Invoices Register"
+        type: interactiveReport
+        source {
+            location: localDatabase
+            type: sqlQuery
+            sqlQuery:
+                ```sql
+                SELECT * FROM KF_VW_INVOICE_SUMMARY
+                ```
+        }
+        layout {
+            sequence: 10
+            slot: body
+        }
+        appearance {
+            template: @/interactive-report
+            templateOptions: #DEFAULT#
+        }
+        advanced {
+            savedReportMappingIdentifier: 10010001
+        }
+
+        savedReport primary (
+            visibility: primaryDefault
+            view {
+                rowsPerPage: 50
+            }
+        )
+
+    )
+
+    button import-invoices (
+        buttonName: IMPORT_INVOICES
+        label: "Import Excel/CSV"
+        layout {
+            sequence: 5
+            region: @invoices
+            slot: rightOfInteractiveReportSearchBar
+        }
+        appearance {
+            buttonTemplate: @/text
+            templateOptions: #DEFAULT#
+        }
+        behavior {
+            action: redirectThisApp
+            target: {
+                page: 12
+                clearCache: 12
+            }
+        }
+    )
+
+    button create-invoice (
+        buttonName: CREATE_INVOICE
+        label: "+ New Invoice"
+        layout {
+            sequence: 10
+            region: @invoices
+            slot: rightOfInteractiveReportSearchBar
+        }
+        appearance {
+            buttonTemplate: @/text
+            hot: true
+            templateOptions: #DEFAULT#
+        }
+        behavior {
+            action: redirectThisApp
+            target: {
+                page: 11
+                clearCache: 11
+            }
+        }
+    )
+
+)

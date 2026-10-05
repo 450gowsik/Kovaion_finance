@@ -1,0 +1,11 @@
+appItem G_FISCAL_YEAR_ID (
+    security {
+        sessionStateProtection: restricted
+    }
+)
+
+appItem G_USER_ID (
+    security {
+        sessionStateProtection: restricted
+    }
+)

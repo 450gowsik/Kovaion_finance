@@ -1,0 +1,68 @@
+list navigation-bar (
+    name: Navigation Bar
+)
+
+list navigation-menu (
+    name: Navigation Menu
+
+    entry dashboard (
+        label: Dashboard
+        icon {
+            imageIconCssClasses: fa-dashboard
+        }
+        layout {
+            sequence: 10
+        }
+        link {
+            target: {
+                page: 1
+            }
+        }
+    )
+
+    entry invoices (
+        label: Invoices
+        icon {
+            imageIconCssClasses: fa-file-invoice
+        }
+        layout {
+            sequence: 20
+        }
+        link {
+            target: {
+                page: 10
+            }
+        }
+    )
+
+    entry payments (
+        label: Payments
+        icon {
+            imageIconCssClasses: fa-credit-card
+        }
+        layout {
+            sequence: 30
+        }
+        link {
+            target: {
+                page: 50
+            }
+        }
+    )
+
+    entry reports (
+        label: Reports
+        icon {
+            imageIconCssClasses: fa-chart-bar
+        }
+        layout {
+            sequence: 40
+        }
+        link {
+            target: {
+                page: 40
+            }
+        }
+    )
+
+)

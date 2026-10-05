@@ -1,0 +1,241 @@
+page 40 (
+    name: Reports
+    alias: REPORTS
+    title: "Financial Reports - Kovaion Finance"
+    appearance {
+        pageMode: normal
+        pageTemplate: @/standard
+        templateOptions: #DEFAULT#
+    }
+    navigation {
+        cursorFocus: doNotFocusCursor
+    }
+    css {
+        inline:
+            ```css
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+            .bqe-reports-page {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                color: #0f172a;
+                background-color: #f8fafc;
+                margin: -16px;
+                padding: 24px;
+            }
+
+            .rep-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 16px;
+                margin-bottom: 24px;
+            }
+            .rep-title-area h1 {
+                font-size: 24px;
+                font-weight: 800;
+                color: #0f172a;
+                letter-spacing: -0.02em;
+                margin: 0 0 4px 0;
+            }
+            .rep-subtitle {
+                font-size: 13px;
+                color: #64748b;
+            }
+
+            /* Report KPI Highlights */
+            .rep-summary-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 16px;
+                margin-bottom: 24px;
+            }
+            @media (max-width: 900px) {
+                .rep-summary-grid { grid-template-columns: 1fr; }
+            }
+            .rep-summary-card {
+                background: #ffffff;
+                border: 1px solid #f1f5f9;
+                border-radius: 14px;
+                padding: 18px 22px;
+                box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+            }
+            .rep-summary-label {
+                font-size: 12px;
+                font-weight: 600;
+                color: #64748b;
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+                margin-bottom: 4px;
+            }
+            .rep-summary-val {
+                font-size: 24px;
+                font-weight: 800;
+                color: #0f172a;
+            }
+            .rep-summary-sub {
+                font-size: 12px;
+                color: #10b981;
+                font-weight: 600;
+                margin-top: 4px;
+            }
+
+            /* Interactive Report Container */
+            .t-Region--interactiveReport {
+                border-radius: 16px !important;
+                border: 1px solid #e2e8f0 !important;
+                box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.04) !important;
+                overflow: hidden !important;
+                background: #ffffff !important;
+                margin-bottom: 28px !important;
+            }
+            .t-Region-header {
+                background: #ffffff !important;
+                border-bottom: 1px solid #f1f5f9 !important;
+                padding: 16px 20px !important;
+            }
+            .t-Region-title {
+                font-size: 16px !important;
+                font-weight: 700 !important;
+                color: #0f172a !important;
+            }
+            .a-IRR-toolbar {
+                background: #ffffff !important;
+                border-bottom: 1px solid #f1f5f9 !important;
+                padding: 10px 18px !important;
+            }
+            .a-IRR-table {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 13px !important;
+            }
+            .a-IRR-header {
+                background: #f8fafc !important;
+                color: #64748b !important;
+                font-size: 11px !important;
+                font-weight: 700 !important;
+                text-transform: uppercase !important;
+                letter-spacing: 0.05em !important;
+                border-bottom: 1px solid #e2e8f0 !important;
+                padding: 12px 16px !important;
+            }
+            .a-IRR-dataRow td {
+                padding: 12px 16px !important;
+                border-bottom: 1px solid #f8fafc !important;
+                vertical-align: middle !important;
+                color: #334155 !important;
+            }
+            .a-IRR-dataRow:hover td {
+                background-color: #f8fafc !important;
+            }
+            ```
+    }
+
+    region reports-overview (
+        name: "Financial Reports Overview"
+        type: staticContent
+        source {
+            htmlCode:
+                ```html
+                <div class="bqe-reports-page">
+                    <div class="rep-header">
+                        <div class="rep-title-area">
+                            <h1>Executive Financial Reports</h1>
+                            <div class="rep-subtitle">Comprehensive audits, outstanding balances, and reconciliation logs</div>
+                        </div>
+                    </div>
+
+                    <div class="rep-summary-grid">
+                        <div class="rep-summary-card">
+                            <div class="rep-summary-label">Total Billed YTD</div>
+                            <div class="rep-summary-val">₹2,84,50,000</div>
+                            <div class="rep-summary-sub">&bull; 100% Tax Compliant (GST/TDS)</div>
+                        </div>
+                        <div class="rep-summary-card">
+                            <div class="rep-summary-label">Total Realized Balances</div>
+                            <div class="rep-summary-val">₹2,42,10,000</div>
+                            <div class="rep-summary-sub">&bull; 85.1% Collection Efficiency</div>
+                        </div>
+                        <div class="rep-summary-card">
+                            <div class="rep-summary-label">Aged Receivables (&gt;45 Days)</div>
+                            <div class="rep-summary-val">₹2,10,000</div>
+                            <div class="rep-summary-sub" style="color: #f59e0b;">&bull; Under active follow-up</div>
+                        </div>
+                    </div>
+                </div>
+                ```
+        }
+        layout {
+            sequence: 5
+            slot: body
+        }
+        appearance {
+            template: @/blank-with-attributes
+            templateOptions: #DEFAULT#
+        }
+    )
+
+    region reports-invoices (
+        name: "Invoice Balances & Aging Summary"
+        type: interactiveReport
+        source {
+            location: localDatabase
+            type: sqlQuery
+            sqlQuery:
+                ```sql
+                SELECT * FROM KF_VW_INVOICE_BALANCES
+                ```
+        }
+        layout {
+            sequence: 10
+            slot: body
+        }
+        appearance {
+            template: @/interactive-report
+            templateOptions: #DEFAULT#
+        }
+        advanced {
+            savedReportMappingIdentifier: 10040001
+        }
+
+        savedReport primary (
+            visibility: primaryDefault
+            view {
+                rowsPerPage: 50
+            }
+        )
+
+    )
+
+    region reports-payments (
+        name: "Settlement & Payment Reconciliation"
+        type: interactiveReport
+        source {
+            location: localDatabase
+            type: sqlQuery
+            sqlQuery:
+                ```sql
+                SELECT * FROM KF_VW_PAYMENT_SUMMARY
+                ```
+        }
+        layout {
+            sequence: 20
+            slot: body
+        }
+        appearance {
+            template: @/interactive-report
+            templateOptions: #DEFAULT#
+        }
+        advanced {
+            savedReportMappingIdentifier: 10040002
+        }
+
+        savedReport primary (
+            visibility: primaryDefault
+            view {
+                rowsPerPage: 50
+            }
+        )
+
+    )
+
+)

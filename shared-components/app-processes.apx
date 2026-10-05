@@ -1,0 +1,23 @@
+appProcess set-g-user-id (
+    name: "SET_G_USER_ID"
+    type: executeCode
+    execution {
+        sequence: 10
+        point: afterAuthentication
+    }
+    source {
+        location: localDatabase
+        language: plsql
+        plsqlCode:
+            ```plsql
+            BEGIN
+                SELECT USER_ID INTO :G_USER_ID
+                FROM KF_USERS
+                WHERE UPPER(USERNAME) = UPPER(:APP_USER);
+            EXCEPTION
+                WHEN NO_DATA_FOUND THEN
+                    :G_USER_ID := NULL;
+            END;
+            ```
+    }
+)

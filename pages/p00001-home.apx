@@ -1,0 +1,753 @@
+page 1 (
+    name: Dashboard
+    alias: HOME
+    title: "Financial Dashboard - Kovaion Finance"
+    appearance {
+        pageTemplate: @/standard
+        templateOptions: #DEFAULT#
+    }
+    navigation {
+        cursorFocus: doNotFocusCursor
+    }
+    javaScript {
+        fileUrls: [
+            https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js
+        ]
+        executeWhenPageLoads:
+            ```javascript
+            (function () {
+                "use strict";
+
+                // Tab switching
+                document.querySelectorAll('.sl-tab-btn').forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        document.querySelectorAll('.sl-tab-btn').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                    });
+                });
+
+                if (typeof Chart === 'undefined') {
+                    console.warn('Chart.js loading...');
+                    return;
+                }
+
+                // 1. Income vs Expenses Bar Chart
+                const barCtx = document.getElementById('incomeExpensesChart');
+                if (barCtx) {
+                    new Chart(barCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'],
+                            datasets: [
+                                {
+                                    label: 'Income',
+                                    data: [18.5, 22.4, 19.8, 25.6, 28.2, 24.0, 31.5, 29.8, 34.2, 32.0, 36.8, 41.2],
+                                    backgroundColor: '#4f46e5',
+                                    borderRadius: 6,
+                                    barPercentage: 0.6,
+                                    categoryPercentage: 0.7
+                                },
+                                {
+                                    label: 'Expenses',
+                                    data: [12.0, 15.2, 14.0, 16.8, 19.0, 17.5, 21.0, 19.4, 22.8, 21.5, 24.0, 25.8],
+                                    backgroundColor: '#f97316',
+                                    borderRadius: 6,
+                                    barPercentage: 0.6,
+                                    categoryPercentage: 0.7
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                    align: 'end',
+                                    labels: { boxWidth: 12, usePointStyle: true, pointStyle: 'circle', font: { family: 'Inter', size: 12, weight: '500' } }
+                                },
+                                tooltip: {
+                                    backgroundColor: '#0f172a',
+                                    padding: 12,
+                                    cornerRadius: 8,
+                                    callbacks: {
+                                        label: function (ctx) { return ctx.dataset.label + ': ₹' + ctx.raw.toFixed(1) + ' Lakhs'; }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    grid: { color: '#f1f5f9' },
+                                    ticks: {
+                                        callback: function (val) { return '₹' + val + 'L'; },
+                                        font: { family: 'Inter', size: 11, color: '#64748b' }
+                                    },
+                                    border: { dash: [4, 4] }
+                                },
+                                x: {
+                                    grid: { display: false },
+                                    ticks: { font: { family: 'Inter', size: 11, color: '#64748b' } }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // 2. Top Expenses Donut Chart
+                const donutCtx = document.getElementById('expensesDonutChart');
+                if (donutCtx) {
+                    new Chart(donutCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Vendor Payments', 'Operations', 'Tax & Compliance', 'Payroll & Benefits', 'Cloud & IT'],
+                            datasets: [{
+                                data: [38, 24, 16, 14, 8],
+                                backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'],
+                                borderWidth: 3,
+                                borderColor: '#ffffff',
+                                hoverOffset: 6
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            cutout: '72%',
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    backgroundColor: '#0f172a',
+                                    padding: 12,
+                                    cornerRadius: 8,
+                                    callbacks: {
+                                        label: function (ctx) { return ' ' + ctx.label + ': ' + ctx.raw + '%'; }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // 3. Cash Flow Trend Line Chart
+                const flowCtx = document.getElementById('cashFlowChart');
+                if (flowCtx) {
+                    new Chart(flowCtx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'],
+                            datasets: [
+                                {
+                                    label: 'Inflow',
+                                    data: [18.5, 22.4, 19.8, 25.6, 28.2, 24.0, 31.5, 29.8, 34.2, 32.0, 36.8, 41.2],
+                                    borderColor: '#10b981',
+                                    backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                                    tension: 0.35,
+                                    fill: true,
+                                    pointRadius: 4,
+                                    pointHoverRadius: 6,
+                                    pointBackgroundColor: '#10b981'
+                                },
+                                {
+                                    label: 'Outflow',
+                                    data: [12.0, 15.2, 14.0, 16.8, 19.0, 17.5, 21.0, 19.4, 22.8, 21.5, 24.0, 25.8],
+                                    borderColor: '#f43f5e',
+                                    backgroundColor: 'rgba(244, 63, 94, 0.04)',
+                                    tension: 0.35,
+                                    fill: true,
+                                    pointRadius: 4,
+                                    pointHoverRadius: 6,
+                                    pointBackgroundColor: '#f43f5e'
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                    align: 'end',
+                                    labels: { boxWidth: 10, usePointStyle: true, pointStyle: 'circle', font: { family: 'Inter', size: 11 } }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    grid: { color: '#f8fafc' },
+                                    ticks: {
+                                        callback: function (val) { return '₹' + val + 'L'; },
+                                        font: { family: 'Inter', size: 10, color: '#94a3b8' }
+                                    }
+                                },
+                                x: {
+                                    grid: { display: false },
+                                    ticks: { font: { family: 'Inter', size: 10, color: '#94a3b8' } }
+                                }
+                            }
+                        }
+                    });
+                }
+            })();
+            ```
+    }
+    css {
+        inline:
+            ```css
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+            .smartledger-dashboard {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                color: #0f172a;
+                background-color: #f8fafc;
+                margin: -16px;
+                padding: 24px;
+            }
+
+            /* Subheader Tabs */
+            .sl-subbar {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 16px;
+                padding-bottom: 20px;
+                margin-bottom: 24px;
+                border-bottom: 1px solid #e2e8f0;
+            }
+            .sl-tabs {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                overflow-x: auto;
+            }
+            .sl-tab-btn {
+                background: none;
+                border: none;
+                padding: 8px 16px;
+                font-size: 13px;
+                font-weight: 600;
+                color: #64748b;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                white-space: nowrap;
+            }
+            .sl-tab-btn:hover {
+                color: #0f172a;
+                background-color: #f1f5f9;
+            }
+            .sl-tab-btn.active {
+                color: #4f46e5;
+                background-color: #eef2ff;
+                font-weight: 700;
+            }
+            .sl-subbar-actions {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+            .sl-date-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 6px 12px;
+                background: #ffffff;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+                font-size: 12px;
+                font-weight: 600;
+                color: #475569;
+            }
+
+            /* KPI Grid Layout */
+            .sl-kpi-row {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr) 1.25fr;
+                gap: 16px;
+                margin-bottom: 24px;
+            }
+            .sl-kpi-col-4 {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 16px;
+                grid-column: span 4;
+            }
+            .sl-card {
+                background: #ffffff;
+                border: 1px solid #e2e8f0;
+                border-radius: 14px;
+                padding: 18px 20px;
+                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+                position: relative;
+                overflow: hidden;
+            }
+            .sl-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+            }
+            .sl-kpi-title {
+                font-size: 12px;
+                font-weight: 600;
+                color: #64748b;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 8px;
+            }
+            .sl-kpi-value {
+                font-size: 24px;
+                font-weight: 800;
+                color: #0f172a;
+                letter-spacing: -0.5px;
+                margin-bottom: 6px;
+            }
+            .sl-kpi-trend {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 12px;
+                font-weight: 600;
+            }
+            .sl-trend-up {
+                color: #10b981;
+            }
+            .sl-trend-down {
+                color: #ef4444;
+            }
+            .sl-trend-neutral {
+                color: #64748b;
+            }
+            .sl-kpi-subtitle {
+                color: #94a3b8;
+                font-weight: 400;
+            }
+
+            /* Company Health Card */
+            .sl-health-card {
+                grid-column: 5 / 6;
+                grid-row: 1 / 3;
+                background: #ffffff;
+                border: 1px solid #e2e8f0;
+                border-radius: 14px;
+                padding: 24px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: space-between;
+                text-align: center;
+                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+            }
+            .sl-health-title {
+                font-size: 15px;
+                font-weight: 700;
+                color: #0f172a;
+                align-self: flex-start;
+                margin-bottom: 12px;
+            }
+            .sl-gauge-wrapper {
+                position: relative;
+                width: 190px;
+                height: 110px;
+                margin: 10px auto;
+            }
+            .sl-gauge-svg {
+                width: 100%;
+                height: 100%;
+            }
+            .sl-gauge-score {
+                position: absolute;
+                bottom: 5px;
+                left: 50%;
+                transform: translateX(-50%);
+                text-align: center;
+            }
+            .sl-gauge-score strong {
+                font-size: 32px;
+                font-weight: 800;
+                color: #0f172a;
+                display: block;
+                line-height: 1;
+            }
+            .sl-gauge-score span {
+                font-size: 12px;
+                font-weight: 700;
+                color: #10b981;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            .sl-health-metrics {
+                width: 100%;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+                margin-top: 16px;
+                padding-top: 16px;
+                border-top: 1px solid #f1f5f9;
+            }
+            .sl-health-item small {
+                display: block;
+                font-size: 11px;
+                color: #64748b;
+                margin-bottom: 2px;
+            }
+            .sl-health-item strong {
+                font-size: 13px;
+                color: #0f172a;
+                font-weight: 700;
+            }
+
+            /* Main Charts Section */
+            .sl-charts-row {
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+                gap: 20px;
+                margin-bottom: 24px;
+            }
+            .sl-chart-card {
+                background: #ffffff;
+                border: 1px solid #e2e8f0;
+                border-radius: 14px;
+                padding: 22px;
+                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+            }
+            .sl-chart-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 18px;
+            }
+            .sl-chart-title {
+                font-size: 16px;
+                font-weight: 700;
+                color: #0f172a;
+                margin: 0;
+            }
+            .sl-chart-tag {
+                font-size: 12px;
+                padding: 4px 10px;
+                border-radius: 6px;
+                background: #f1f5f9;
+                color: #475569;
+                font-weight: 600;
+            }
+            .sl-chart-canvas-container {
+                position: relative;
+                height: 280px;
+                width: 100%;
+            }
+
+            /* Donut Legend */
+            .sl-donut-legend {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                margin-top: 16px;
+            }
+            .sl-legend-item {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                font-size: 12px;
+            }
+            .sl-legend-label {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                color: #475569;
+                font-weight: 500;
+            }
+            .sl-legend-dot {
+                width: 10px;
+                height: 10px;
+                border-radius: 3px;
+                display: inline-block;
+            }
+            .sl-legend-val {
+                font-weight: 700;
+                color: #0f172a;
+            }
+
+            /* Bottom Row */
+            .sl-bottom-row {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 20px;
+            }
+            .sl-bank-item {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 14px 16px;
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
+                border-radius: 10px;
+                margin-bottom: 10px;
+                transition: background 0.15s ease;
+            }
+            .sl-bank-item:hover {
+                background: #f1f5f9;
+            }
+            .sl-bank-name {
+                font-size: 13px;
+                font-weight: 700;
+                color: #0f172a;
+            }
+            .sl-bank-type {
+                font-size: 11px;
+                color: #64748b;
+                margin-top: 2px;
+            }
+            .sl-bank-amount {
+                font-size: 15px;
+                font-weight: 800;
+                color: #0f172a;
+            }
+
+            /* Status Pills */
+            .sl-status-pill {
+                display: inline-flex;
+                align-items: center;
+                padding: 4px 10px;
+                border-radius: 9999px;
+                font-size: 11px;
+                font-weight: 700;
+            }
+            .sl-pill-green { background: #dcfce7; color: #15803d; }
+            .sl-pill-blue { background: #dbeafe; color: #1e40af; }
+            .sl-pill-amber { background: #fef3c7; color: #b45309; }
+
+            @media (max-width: 1200px) {
+                .sl-kpi-row { grid-template-columns: repeat(2, 1fr); }
+                .sl-kpi-col-4 { grid-column: span 2; grid-template-columns: repeat(2, 1fr); }
+                .sl-health-card { grid-column: span 2; }
+                .sl-charts-row { grid-template-columns: 1fr; }
+                .sl-bottom-row { grid-template-columns: 1fr; }
+            }
+            @media (max-width: 640px) {
+                .sl-kpi-col-4 { grid-template-columns: 1fr; }
+                .sl-kpi-row { grid-template-columns: 1fr; }
+            }
+            ```
+    }
+
+    region dashboard-view (
+        name: "Financial Overview Dashboard"
+        type: staticContent
+        layout {
+            sequence: 10
+            slot: body
+        }
+        appearance {
+            template: @/blank-with-attributes
+            templateOptions: #DEFAULT#
+        }
+        source {
+            htmlCode:
+                ```html
+                <div class="smartledger-dashboard">
+                    <!-- Top Subbar with Filters -->
+                    <div class="sl-subbar">
+                        <div class="sl-tabs">
+                            <button type="button" class="sl-tab-btn active">Overview</button>
+                            <button type="button" class="sl-tab-btn">Profitability</button>
+                            <button type="button" class="sl-tab-btn">Liquidity</button>
+                            <button type="button" class="sl-tab-btn">Efficiency</button>
+                            <button type="button" class="sl-tab-btn">Taxation</button>
+                            <button type="button" class="sl-tab-btn">SmartInsights</button>
+                        </div>
+                        <div class="sl-subbar-actions">
+                            <div class="sl-date-badge">
+                                <span style="color:#4f46e5;">●</span> FY 2024–25 (Q3)
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 1 & 2: Top 8 KPI Cards + Company Health Gauge -->
+                    <div class="sl-kpi-row">
+                        <!-- Top 4 KPIs -->
+                        <div class="sl-card">
+                            <div class="sl-kpi-title">Total Bank Balance</div>
+                            <div class="sl-kpi-value">₹1,24,20,000</div>
+                            <div class="sl-kpi-trend sl-trend-up">
+                                <span>↑ +12.4%</span> <span class="sl-kpi-subtitle">vs last month</span>
+                            </div>
+                        </div>
+
+                        <div class="sl-card">
+                            <div class="sl-kpi-title">Total Receivables</div>
+                            <div class="sl-kpi-value">₹38,50,000</div>
+                            <div class="sl-kpi-trend sl-trend-down">
+                                <span>↓ -4.2%</span> <span class="sl-kpi-subtitle">14 invoices pending</span>
+                            </div>
+                        </div>
+
+                        <div class="sl-card">
+                            <div class="sl-kpi-title">Total Payables</div>
+                            <div class="sl-kpi-value">₹24,15,000</div>
+                            <div class="sl-kpi-trend sl-trend-up">
+                                <span>↑ ₹15.2L</span> <span class="sl-kpi-subtitle">due in 15 days</span>
+                            </div>
+                        </div>
+
+                        <div class="sl-card">
+                            <div class="sl-kpi-title">Net Profit Margin</div>
+                            <div class="sl-kpi-value">24.8%</div>
+                            <div class="sl-kpi-trend sl-trend-up">
+                                <span>↑ +3.5%</span> <span class="sl-kpi-subtitle">industry benchmark 18%</span>
+                            </div>
+                        </div>
+
+                        <!-- Company Health Gauge (Spans 2 rows on right) -->
+                        <div class="sl-health-card">
+                            <div class="sl-health-title">Company Financial Health</div>
+                            <div class="sl-gauge-wrapper">
+                                <svg class="sl-gauge-svg" viewBox="0 0 100 55">
+                                    <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e2e8f0" stroke-width="10" stroke-linecap="round" />
+                                    <path d="M 10 50 A 40 40 0 0 1 80 22" fill="none" stroke="url(#gaugeGradient)" stroke-width="10" stroke-linecap="round" />
+                                    <defs>
+                                        <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" stop-color="#10b981" />
+                                            <stop offset="100%" stop-color="#059669" />
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                                <div class="sl-gauge-score">
+                                    <strong>88</strong>
+                                    <span>EXCELLENT</span>
+                                </div>
+                            </div>
+                            <div class="sl-health-metrics">
+                                <div class="sl-health-item">
+                                    <small>Liquidity Ratio</small>
+                                    <strong>2.4x (Safe)</strong>
+                                </div>
+                                <div class="sl-health-item">
+                                    <small>Solvency Score</small>
+                                    <strong>A+ Grade</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Second row of 4 KPIs -->
+                        <div class="sl-card">
+                            <div class="sl-kpi-title">Revenue Growth</div>
+                            <div class="sl-kpi-value">18.5%</div>
+                            <div class="sl-kpi-trend sl-trend-up">
+                                <span>↑ YoY</span> <span class="sl-kpi-subtitle">target: 15%</span>
+                            </div>
+                        </div>
+
+                        <div class="sl-card">
+                            <div class="sl-kpi-title">GST Payable</div>
+                            <div class="sl-kpi-value">₹8,45,000</div>
+                            <div class="sl-kpi-trend sl-trend-neutral">
+                                <span>● Due next month</span>
+                            </div>
+                        </div>
+
+                        <div class="sl-card">
+                            <div class="sl-kpi-title">Tax Liability (YTD)</div>
+                            <div class="sl-kpi-value">₹16,50,000</div>
+                            <div class="sl-kpi-trend sl-trend-neutral">
+                                <span>● Provisioned for Q3</span>
+                            </div>
+                        </div>
+
+                        <div class="sl-card">
+                            <div class="sl-kpi-title">Cash Runway</div>
+                            <div class="sl-kpi-value">18 Months</div>
+                            <div class="sl-kpi-trend sl-trend-up">
+                                <span>↑ +2 mos</span> <span class="sl-kpi-subtitle">at current burn</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Income vs Expenses & Top Expenses Charts -->
+                    <div class="sl-charts-row">
+                        <div class="sl-chart-card">
+                            <div class="sl-chart-header">
+                                <h3 class="sl-chart-title">Income vs Expenses Analysis</h3>
+                                <span class="sl-chart-tag">FY 2024-25 Monthly</span>
+                            </div>
+                            <div class="sl-chart-canvas-container">
+                                <canvas id="incomeExpensesChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="sl-chart-card">
+                            <div class="sl-chart-header">
+                                <h3 class="sl-chart-title">Top Expense Distribution</h3>
+                                <span class="sl-chart-tag">This Quarter</span>
+                            </div>
+                            <div class="sl-chart-canvas-container" style="height: 180px;">
+                                <canvas id="expensesDonutChart"></canvas>
+                            </div>
+                            <div class="sl-donut-legend">
+                                <div class="sl-legend-item">
+                                    <div class="sl-legend-label"><span class="sl-legend-dot" style="background:#3b82f6;"></span>Vendor Payments</div>
+                                    <span class="sl-legend-val">38% (₹16.2L)</span>
+                                </div>
+                                <div class="sl-legend-item">
+                                    <div class="sl-legend-label"><span class="sl-legend-dot" style="background:#10b981;"></span>Operations &amp; Admin</div>
+                                    <span class="sl-legend-val">24% (₹10.3L)</span>
+                                </div>
+                                <div class="sl-legend-item">
+                                    <div class="sl-legend-label"><span class="sl-legend-dot" style="background:#f59e0b;"></span>Tax &amp; Compliance</div>
+                                    <span class="sl-legend-val">16% (₹6.8L)</span>
+                                </div>
+                                <div class="sl-legend-item">
+                                    <div class="sl-legend-label"><span class="sl-legend-dot" style="background:#ec4899;"></span>Payroll &amp; Benefits</div>
+                                    <span class="sl-legend-val">14% (₹6.0L)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 4: Cash Flow & Bank Accounts -->
+                    <div class="sl-bottom-row">
+                        <!-- Cash Flow Line Chart -->
+                        <div class="sl-chart-card" style="grid-column: span 2;">
+                            <div class="sl-chart-header">
+                                <h3 class="sl-chart-title">Net Cash Flow Trend</h3>
+                                <span class="sl-chart-tag">Incoming vs Outgoing</span>
+                            </div>
+                            <div class="sl-chart-canvas-container" style="height: 200px;">
+                                <canvas id="cashFlowChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Bank Accounts & Balances -->
+                        <div class="sl-chart-card">
+                            <div class="sl-chart-header">
+                                <h3 class="sl-chart-title">Accounts &amp; Balances</h3>
+                                <span class="sl-chart-tag">Live Balances</span>
+                            </div>
+                            <div>
+                                <div class="sl-bank-item">
+                                    <div>
+                                        <div class="sl-bank-name">HDFC Bank Ltd.</div>
+                                        <div class="sl-bank-type">Corporate Current A/C •••• 9821</div>
+                                    </div>
+                                    <div class="sl-bank-amount">₹68,50,000</div>
+                                </div>
+                                <div class="sl-bank-item">
+                                    <div>
+                                        <div class="sl-bank-name">ICICI Bank Ltd.</div>
+                                        <div class="sl-bank-type">Operating Current A/C •••• 4120</div>
+                                    </div>
+                                    <div class="sl-bank-amount">₹32,20,000</div>
+                                </div>
+                                <div class="sl-bank-item">
+                                    <div>
+                                        <div class="sl-bank-name">State Bank of India</div>
+                                        <div class="sl-bank-type">Statutory Reserves A/C •••• 1054</div>
+                                    </div>
+                                    <div class="sl-bank-amount">₹23,50,000</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                ```
+        }
+    )
+
+)

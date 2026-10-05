@@ -1,0 +1,582 @@
+page 12 (
+    name: "Import Invoices"
+    alias: IMPORT-INVOICES
+    title: "Import Invoices (Excel / CSV)"
+    appearance {
+        pageMode: modalDialog
+        dialogTemplate: @/modal-dialog
+        templateOptions: #DEFAULT#
+    }
+    dialog {
+        chained: false
+    }
+
+    css {
+        inline:
+            ```css
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+            .import-dialog-container {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            }
+            .import-guide-box {
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
+                border-radius: 12px;
+                padding: 16px 20px;
+                margin-bottom: 20px;
+            }
+            .import-guide-title {
+                font-size: 14px;
+                font-weight: 700;
+                color: #0f172a;
+                margin-bottom: 8px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .import-mapping-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 10px;
+                margin-top: 12px;
+            }
+            @media (max-width: 768px) {
+                .import-mapping-grid { grid-template-columns: repeat(2, 1fr); }
+            }
+            .mapping-pill {
+                background: #ffffff;
+                border: 1px solid #cbd5e1;
+                border-radius: 8px;
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+            .mapping-pill strong {
+                display: block;
+                color: #4f46e5;
+                font-size: 11px;
+                text-transform: uppercase;
+                margin-bottom: 2px;
+            }
+            .mapping-pill span {
+                color: #334155;
+                font-weight: 600;
+            }
+
+            /* Validation Stats Banner */
+            .val-stats-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 12px;
+                margin: 16px 0;
+            }
+            .val-card {
+                background: #ffffff;
+                border: 1px solid #e2e8f0;
+                border-radius: 10px;
+                padding: 12px 16px;
+                text-align: center;
+            }
+            .val-card.valid { border-left: 4px solid #10b981; }
+            .val-card.invalid { border-left: 4px solid #ef4444; }
+            .val-card.dup { border-left: 4px solid #f59e0b; }
+            .val-card.total { border-left: 4px solid #4f46e5; }
+            .val-num {
+                font-size: 20px;
+                font-weight: 800;
+                color: #0f172a;
+            }
+            .val-lbl {
+                font-size: 11px;
+                font-weight: 600;
+                color: #64748b;
+                text-transform: uppercase;
+            }
+
+            /* Badge Pills for Preview Table */
+            .badge-val-valid {
+                background-color: #dcfce7;
+                color: #15803d;
+                border: 1px solid #bbf7d0;
+                padding: 3px 8px;
+                border-radius: 9999px;
+                font-size: 11px;
+                font-weight: 700;
+            }
+            .badge-val-error {
+                background-color: #fee2e2;
+                color: #b91c1c;
+                border: 1px solid #fecaca;
+                padding: 3px 8px;
+                border-radius: 9999px;
+                font-size: 11px;
+                font-weight: 700;
+            }
+            .badge-val-dup {
+                background-color: #fef3c7;
+                color: #b45309;
+                border: 1px solid #fef08a;
+                padding: 3px 8px;
+                border-radius: 9999px;
+                font-size: 11px;
+                font-weight: 700;
+            }
+            ```
+    }
+
+    region upload-guide (
+        name: "Import Guide & Column Specifications"
+        type: staticContent
+        layout {
+            sequence: 5
+            slot: contentBody
+        }
+        appearance {
+            template: @/blank-with-attributes
+            templateOptions: #DEFAULT#
+        }
+        source {
+            htmlCode:
+                ```html
+                <div class="import-dialog-container">
+                    <div class="import-guide-box">
+                        <div class="import-guide-title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                            Standard Column Layout (Row 1 Header, Data starting on Row 2)
+                        </div>
+                        <div class="import-mapping-grid">
+                            <div class="mapping-pill">
+                                <strong>Col 1 &bull; Required</strong>
+                                <span>Invoice Number</span>
+                            </div>
+                            <div class="mapping-pill">
+                                <strong>Col 2 &bull; Required</strong>
+                                <span>Vendor Name / Code</span>
+                            </div>
+                            <div class="mapping-pill">
+                                <strong>Col 3 &bull; Date</strong>
+                                <span>Invoice Date</span>
+                            </div>
+                            <div class="mapping-pill">
+                                <strong>Col 4 &bull; Date</strong>
+                                <span>Due Date (&ge; Inv Date)</span>
+                            </div>
+                            <div class="mapping-pill">
+                                <strong>Col 5 &bull; Number</strong>
+                                <span>Subtotal / Taxable</span>
+                            </div>
+                            <div class="mapping-pill">
+                                <strong>Col 6 &bull; Number</strong>
+                                <span>Tax Amount (GST)</span>
+                            </div>
+                            <div class="mapping-pill">
+                                <strong>Col 7 &bull; Optional</strong>
+                                <span>Status (DRAFT / PENDING)</span>
+                            </div>
+                            <div class="mapping-pill">
+                                <strong>Accepted Types</strong>
+                                <span>.xlsx, .xls, .csv</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                ```
+        }
+    )
+
+    region file-upload-region (
+        name: "File Selection"
+        type: staticContent
+        layout {
+            sequence: 10
+            slot: contentBody
+        }
+        appearance {
+            template: @/standard
+            templateOptions: #DEFAULT#
+        }
+    )
+
+    pageItem P12_FILE (
+        type: fileUpload
+        label {
+            label: "Choose Excel / CSV File"
+        }
+        layout {
+            sequence: 10
+            region: @file-upload-region
+            slot: regionBody
+        }
+        appearance {
+            template: @/optional-floating
+            templateOptions: #DEFAULT#
+        }
+    )
+
+    region preview-report (
+        name: "Parsed Data Preview & Validation"
+        type: interactiveReport
+        source {
+            location: localDatabase
+            type: sqlQuery
+            sqlQuery:
+                ```sql
+                SELECT c001 AS INVOICE_NUMBER,
+                       c002 AS VENDOR,
+                       c003 AS INVOICE_DATE,
+                       c004 AS DUE_DATE,
+                       c005 AS SUBTOTAL,
+                       c006 AS TAX_AMOUNT,
+                       c007 AS STATUS,
+                       c008 AS VALIDATION_STATUS,
+                       c009 AS ERROR_DETAILS
+                FROM apex_collections
+                WHERE collection_name = 'KF_IMPORT_PREVIEW'
+                ```
+        }
+        layout {
+            sequence: 20
+            slot: contentBody
+        }
+        appearance {
+            template: @/interactive-report
+            templateOptions: #DEFAULT#
+        }
+        advanced {
+            savedReportMappingIdentifier: 10012001
+        }
+
+        column INVOICE_NUMBER (
+            type: plainText
+            heading {
+                heading: "Invoice Number"
+            }
+            layout {
+                sequence: 10
+            }
+            source {
+                dataType: STRING
+            }
+        )
+
+        column VENDOR (
+            type: plainText
+            heading {
+                heading: "Vendor"
+            }
+            layout {
+                sequence: 20
+            }
+            source {
+                dataType: STRING
+            }
+        )
+
+        column INVOICE_DATE (
+            type: plainText
+            heading {
+                heading: "Invoice Date"
+            }
+            layout {
+                sequence: 30
+            }
+            source {
+                dataType: STRING
+            }
+        )
+
+        column DUE_DATE (
+            type: plainText
+            heading {
+                heading: "Due Date"
+            }
+            layout {
+                sequence: 40
+            }
+            source {
+                dataType: STRING
+            }
+        )
+
+        column SUBTOTAL (
+            type: plainText
+            heading {
+                heading: "Subtotal"
+            }
+            layout {
+                sequence: 50
+            }
+            source {
+                dataType: STRING
+            }
+        )
+
+        column TAX_AMOUNT (
+            type: plainText
+            heading {
+                heading: "Tax Amount"
+            }
+            layout {
+                sequence: 60
+            }
+            source {
+                dataType: STRING
+            }
+        )
+
+        column STATUS (
+            type: plainText
+            heading {
+                heading: "Status"
+            }
+            layout {
+                sequence: 70
+            }
+            source {
+                dataType: STRING
+            }
+        )
+
+        column VALIDATION_STATUS (
+            type: plainText
+            heading {
+                heading: "Validation Status"
+            }
+            layout {
+                sequence: 80
+            }
+            source {
+                dataType: STRING
+            }
+        )
+
+        column ERROR_DETAILS (
+            type: plainText
+            heading {
+                heading: "Error Details"
+            }
+            layout {
+                sequence: 90
+            }
+            source {
+                dataType: STRING
+            }
+        )
+
+        savedReport primary (
+            visibility: primaryDefault
+            view {
+                rowsPerPage: 50
+            }
+
+            displayColumn INVOICE_NUMBER (
+                sequence: 10
+            )
+
+            displayColumn VENDOR (
+                sequence: 20
+            )
+
+            displayColumn INVOICE_DATE (
+                sequence: 30
+            )
+
+            displayColumn DUE_DATE (
+                sequence: 40
+            )
+
+            displayColumn SUBTOTAL (
+                sequence: 50
+            )
+
+            displayColumn TAX_AMOUNT (
+                sequence: 60
+            )
+
+            displayColumn STATUS (
+                sequence: 70
+            )
+
+            displayColumn VALIDATION_STATUS (
+                sequence: 80
+            )
+
+            displayColumn ERROR_DETAILS (
+                sequence: 90
+            )
+
+        )
+
+    )
+
+    region buttons (
+        name: Buttons
+        type: staticContent
+        layout {
+            sequence: 30
+            slot: dialogFooter
+        }
+        appearance {
+            template: @/buttons-container
+            templateOptions: #DEFAULT#
+        }
+    )
+
+    button cancel (
+        buttonName: CANCEL
+        label: Cancel
+        layout {
+            sequence: 10
+            region: @buttons
+            slot: previous
+        }
+        appearance {
+            buttonTemplate: @/text
+            templateOptions: #DEFAULT#
+        }
+        behavior {
+            action: triggerAction
+        }
+
+        triggerAction native-dialog-cancel (
+            action: cancelDialog
+            execution {
+                sequence: 10
+            }
+        )
+
+    )
+
+    button preview (
+        buttonName: PREVIEW
+        label: "Upload & Preview"
+        layout {
+            sequence: 20
+            region: @buttons
+            slot: next
+        }
+        appearance {
+            buttonTemplate: @/text
+            hot: true
+            templateOptions: #DEFAULT#
+        }
+        behavior {
+            action: submitPage
+        }
+    )
+
+    button confirm-import (
+        buttonName: CONFIRM_IMPORT
+        label: "Confirm & Import"
+        layout {
+            sequence: 30
+            region: @buttons
+            slot: next
+        }
+        appearance {
+            buttonTemplate: @/text
+            hot: true
+            templateOptions: #DEFAULT#
+        }
+        behavior {
+            action: submitPage
+        }
+    )
+
+    process parse-file-preview (
+        name: "Parse and Preview File"
+        type: executeCode
+        source {
+            plsqlCode:
+                ```plsql
+                DECLARE
+                    l_total NUMBER;
+                    l_valid NUMBER;
+                    l_invalid NUMBER;
+                    l_dup NUMBER;
+                    l_size NUMBER;
+                BEGIN
+                    IF :P12_FILE IS NOT NULL THEN
+                        KF_PKG_INVOICE_IMPORT.PARSE_AND_PREVIEW(
+                            p_file_name      => :P12_FILE,
+                            p_total_rows     => l_total,
+                            p_valid_rows     => l_valid,
+                            p_invalid_rows   => l_invalid,
+                            p_duplicate_rows => l_dup,
+                            p_file_size_kb   => l_size
+                        );
+                        apex_application.g_print_success_message := 
+                            'File parsed successfully. Total: ' || l_total || ' | Valid: ' || l_valid || ' | Errors: ' || l_invalid || ' | Duplicates: ' || l_dup;
+                    ELSE
+                        apex_error.add_error(
+                            p_message => 'Please select an Excel or CSV file to upload.',
+                            p_display_location => apex_error.c_inline_in_notification
+                        );
+                    END IF;
+                END;
+                ```
+        }
+        execution {
+            sequence: 10
+        }
+        serverSideCondition {
+            type: requestIsContainedInValue
+            value: PREVIEW
+        }
+        advanced {
+            executionMappingIdentifier: 10012002
+        }
+    )
+
+    process execute-import (
+        name: "Execute Invoice Import"
+        type: executeCode
+        source {
+            plsqlCode:
+                ```plsql
+                DECLARE
+                    l_batch_id NUMBER;
+                    l_success NUMBER;
+                    l_failed NUMBER;
+                    l_msg VARCHAR2(4000);
+                BEGIN
+                    KF_PKG_INVOICE_IMPORT.CONFIRM_IMPORT(
+                        p_file_name     => :P12_FILE,
+                        p_user_name     => :APP_USER,
+                        p_batch_id      => l_batch_id,
+                        p_success_count => l_success,
+                        p_failed_count  => l_failed,
+                        p_status_msg    => l_msg
+                    );
+                    apex_application.g_print_success_message := l_msg;
+                END;
+                ```
+        }
+        execution {
+            sequence: 20
+        }
+        serverSideCondition {
+            type: requestIsContainedInValue
+            value: CONFIRM_IMPORT
+        }
+        advanced {
+            executionMappingIdentifier: 10012003
+        }
+    )
+
+    process close-modal-dialog (
+        name: "Close Modal Dialog"
+        type: closeDialog
+        execution {
+            sequence: 30
+        }
+        serverSideCondition {
+            type: requestIsContainedInValue
+            value: CONFIRM_IMPORT
+        }
+        advanced {
+            executionMappingIdentifier: 10012004
+        }
+    )
+
+)
