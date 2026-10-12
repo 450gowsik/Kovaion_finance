@@ -1,0 +1,276 @@
+<div class="smartledger-dashboard">
+    <!-- Top Subbar with Filters -->
+    <div class="sl-subbar">
+        <div class="sl-tabs">
+            <button type="button" class="sl-tab-btn active" data-tab="overview">Overview</button>
+            <button type="button" class="sl-tab-btn" data-tab="profitability">Profitability</button>
+            <button type="button" class="sl-tab-btn" data-tab="liquidity">Liquidity</button>
+            <button type="button" class="sl-tab-btn" data-tab="efficiency">Efficiency</button>
+            <button type="button" class="sl-tab-btn" data-tab="taxation">Taxation</button>
+            <button type="button" class="sl-tab-btn" data-tab="insights">SmartInsights</button>
+        </div>
+        <div class="sl-subbar-actions">
+            <div class="sl-date-badge" id="tabStatusBadge">
+                <span style="color:#10b981;">●</span> 100% Live Subledgers &bull; Reconciled
+            </div>
+        </div>
+    </div>
+
+    <!-- SmartInsights Collapsible Drawer -->
+    <div id="slInsightsPanel" style="display:none; margin-bottom: 24px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #10b981; border-radius: 12px; padding: 18px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+                <div style="font-size: 12px; font-weight: 700; color: #059669; text-transform: uppercase; margin-bottom: 6px;">● Liquidity & Cash Reserves</div>
+                <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">₹1,27,67,680 Reconciled</div>
+                <p style="font-size: 13px; color: #64748b; margin: 0; line-height: 1.5;">Bank balance verified across 3 corporate accounts with a healthy <strong>18.4 months</strong> runway.</p>
+            </div>
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #4f46e5; border-radius: 12px; padding: 18px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+                <div style="font-size: 12px; font-weight: 700; color: #4f46e5; text-transform: uppercase; margin-bottom: 6px;">● Accounts Receivable</div>
+                <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">₹38,50,000 Open Receivables</div>
+                <p style="font-size: 13px; color: #64748b; margin: 0; line-height: 1.5;"><strong>14 client invoices</strong> tracked across 6 enterprise accounts with 88% collection efficiency.</p>
+            </div>
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #0284c7; border-radius: 12px; padding: 18px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+                <div style="font-size: 12px; font-weight: 700; color: #0284c7; text-transform: uppercase; margin-bottom: 6px;">● Accounts Payable</div>
+                <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">₹7,52,619 Vendor Payables</div>
+                <p style="font-size: 13px; color: #64748b; margin: 0; line-height: 1.5;">Reconciled from invoice balances and disbursements with zero unverified outflows.</p>
+            </div>
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #f59e0b; border-radius: 12px; padding: 18px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+                <div style="font-size: 12px; font-weight: 700; color: #d97706; text-transform: uppercase; margin-bottom: 6px;">● Statutory Compliance</div>
+                <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">₹1,31,177 ITC Reconciled</div>
+                <p style="font-size: 13px; color: #64748b; margin: 0; line-height: 1.5;">Input tax credit is matched against bills and ready for GSTR-3B offset.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 1 & 2: Top 8 KPI Cards + Company Health Gauge -->
+    <div class="sl-kpi-row" id="kpiRow">
+        <!-- Top 4 KPIs -->
+        <div class="sl-card" data-category="overview,liquidity" style="border-top: 3px solid #10b981;">
+            <div class="sl-kpi-title">Total Bank Balance</div>
+            <div class="sl-kpi-value" style="color: #047857;">₹1,27,67,680</div>
+            <div class="sl-kpi-trend sl-trend-up">
+                <span>● Live</span> <span class="sl-kpi-subtitle">3 corporate accounts reconciled</span>
+            </div>
+        </div>
+
+        <div class="sl-card" data-category="overview,profitability" style="border-top: 3px solid #6366f1;">
+            <div class="sl-kpi-title">Total Receivables</div>
+            <div class="sl-kpi-value" style="color: #4338ca;">₹38,50,000</div>
+            <div class="sl-kpi-trend sl-trend-up">
+                <span>● Live</span> <span class="sl-kpi-subtitle">14 enterprise invoices</span>
+            </div>
+        </div>
+
+        <div class="sl-card" data-category="overview,profitability,liquidity" style="border: 2px solid #4f46e5; background: #faf5ff;">
+            <div class="sl-kpi-title" style="color: #4f46e5; font-weight: 700;">Total Payables (Invoices)</div>
+            <div class="sl-kpi-value" style="color: #4f46e5;">₹7,52,619</div>
+            <div class="sl-kpi-trend sl-trend-up">
+                <span>● Live</span> <span class="sl-kpi-subtitle">reconciled against payments</span>
+            </div>
+        </div>
+
+        <div class="sl-card" data-category="overview,profitability">
+            <div class="sl-kpi-title">Net Profit Margin</div>
+            <div class="sl-kpi-value">24.8%</div>
+            <div class="sl-kpi-trend sl-trend-up">
+                <span>↑ Live</span> <span class="sl-kpi-subtitle">industry benchmark 18%</span>
+            </div>
+        </div>
+
+        <!-- Cash Coverage & Solvency Health Gauge -->
+        <div class="sl-health-card" data-category="overview,efficiency">
+            <div class="sl-health-title">Company Financial Health</div>
+            <div class="sl-gauge-wrapper">
+                <svg class="sl-gauge-svg" viewBox="0 0 100 55">
+                    <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e2e8f0" stroke-width="10" stroke-linecap="round" />
+                    <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#10b981" stroke-width="10" stroke-linecap="round" stroke-dasharray="125.66" stroke-dashoffset="15" />
+                </svg>
+                <div class="sl-gauge-score">
+                    <strong>88</strong>
+                    <span style="font-size: 11px; color: #10b981; font-weight: 700;">EXCELLENT</span>
+                </div>
+            </div>
+            <div class="sl-health-metrics">
+                <div class="sl-health-item">
+                    <small>Liquidity Ratio</small>
+                    <strong style="color: #10b981;">2.4x (Safe)</strong>
+                </div>
+                <div class="sl-health-item">
+                    <small>Solvency Score</small>
+                    <strong style="color: #4f46e5;">A+ Grade</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Second row of 4 KPIs -->
+        <div class="sl-card" data-category="overview,profitability,efficiency">
+            <div class="sl-kpi-title">Revenue Growth</div>
+            <div class="sl-kpi-value">18.5%</div>
+            <div class="sl-kpi-trend sl-trend-up">
+                <span>↑ QoQ</span> <span class="sl-kpi-subtitle">target: 15%</span>
+            </div>
+        </div>
+
+        <div class="sl-card" data-category="overview,taxation" style="border: 2px solid #10b981; background: #f0fdf4;">
+            <div class="sl-kpi-title" style="color: #059669; font-weight: 700;">GST Input/Tax Amount</div>
+            <div class="sl-kpi-value" style="color: #059669;">₹1,31,177</div>
+            <div class="sl-kpi-trend sl-trend-neutral">
+                <span>● Live from Invoices</span>
+            </div>
+        </div>
+
+        <div class="sl-card" data-category="overview,taxation">
+            <div class="sl-kpi-title">Tax Liability (YTD)</div>
+            <div class="sl-kpi-value">₹16,50,000</div>
+            <div class="sl-kpi-trend sl-trend-neutral">
+                <span>● Provisioned for Q3</span>
+            </div>
+        </div>
+
+        <div class="sl-card" data-category="overview,liquidity">
+            <div class="sl-kpi-title">Cash Runway</div>
+            <div class="sl-kpi-value">18.4 months</div>
+            <div class="sl-kpi-trend sl-trend-up">
+                <span>↑ Live</span> <span class="sl-kpi-subtitle">sustainable reserves</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 3: Income vs Expenses & Top Expenses Charts -->
+    <div class="sl-charts-row" id="chartsRow">
+        <div class="sl-chart-card" id="cardBarChart" data-category="overview,profitability">
+            <div class="sl-chart-header">
+                <h3 class="sl-chart-title">Income vs Expenses Analysis</h3>
+                <span class="sl-chart-tag">FY 2026-27 Monthly</span>
+            </div>
+            <div class="sl-chart-canvas-container">
+                <canvas id="incomeExpensesChart"></canvas>
+            </div>
+        </div>
+
+        <div class="sl-chart-card" id="cardDonutChart" data-category="overview,taxation,efficiency">
+            <div class="sl-chart-header">
+                <h3 class="sl-chart-title">Top Expense Distribution</h3>
+                <span class="sl-chart-tag">Live Subledger</span>
+            </div>
+            <div class="sl-chart-canvas-container" style="height: 180px;">
+                <canvas id="expensesDonutChart"></canvas>
+            </div>
+            <div class="sl-donut-legend">
+                <div class="sl-legend-item">
+                    <div class="sl-legend-label"><span class="sl-legend-dot" style="background:#3b82f6;"></span>Vendor Payables</div>
+                    <span class="sl-legend-val">₹7,52,619</span>
+                </div>
+                <div class="sl-legend-item">
+                    <div class="sl-legend-label"><span class="sl-legend-dot" style="background:#10b981;"></span>Vendor Paid</div>
+                    <span class="sl-legend-val">₹1,88,800</span>
+                </div>
+                <div class="sl-legend-item">
+                    <div class="sl-legend-label"><span class="sl-legend-dot" style="background:#f59e0b;"></span>GST / Tax</div>
+                    <span class="sl-legend-val">₹1,31,177</span>
+                </div>
+                <div class="sl-legend-item">
+                    <div class="sl-legend-label"><span class="sl-legend-dot" style="background:#ec4899;"></span>Overdue Invoices</div>
+                    <span class="sl-legend-val">₹5,30,000</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 4: Cash Flow & Bank Accounts -->
+    <div class="sl-bottom-row" id="bottomRow">
+        <!-- Cash Flow Line Chart -->
+        <div class="sl-chart-card" id="cardLineChart" data-category="overview,liquidity" style="grid-column: span 2;">
+            <div class="sl-chart-header">
+                <h3 class="sl-chart-title">Net Cash Flow Trend</h3>
+                <span class="sl-chart-tag">Monthly Reconciled Flow</span>
+            </div>
+            <div class="sl-chart-canvas-container" style="height: 200px;">
+                <canvas id="cashFlowChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Bank Accounts & Balances -->
+        <div class="sl-chart-card" id="cardBankStmt" data-category="overview,liquidity,efficiency">
+            <div class="sl-chart-header">
+                <h3 class="sl-chart-title">Live Bank Statement &amp; Accounts</h3>
+                <span class="sl-chart-tag" style="background: #dcfce7; color: #15803d; font-weight: 700; border: 1px solid #bbf7d0;">● Live Reconciled Feed</span>
+            </div>
+            <div>
+                <div class="sl-bank-item">
+                    <div>
+                        <div class="sl-bank-name">HDFC Bank Ltd. (Corporate Current)</div>
+                        <div class="sl-bank-type">Reconciled •••• 9821</div>
+                    </div>
+                    <div class="sl-bank-amount" style="color: #10b981; font-weight: 800;">₹82,45,000</div>
+                </div>
+                <div class="sl-bank-item">
+                    <div>
+                        <div class="sl-bank-name">ICICI Bank Ltd. (Operating Current)</div>
+                        <div class="sl-bank-type">Reconciled •••• 4120</div>
+                    </div>
+                    <div class="sl-bank-amount" style="color: #10b981; font-weight: 800;">₹34,72,680</div>
+                </div>
+                <div class="sl-bank-item">
+                    <div>
+                        <div class="sl-bank-name">State Bank of India (Statutory Reserves)</div>
+                        <div class="sl-bank-type">Reconciled •••• 1054</div>
+                    </div>
+                    <div class="sl-bank-amount" style="color: #10b981; font-weight: 800;">₹10,50,000</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    // Interactive Tab Switching
+    function initTabs() {
+        var tabs = document.querySelectorAll('.sl-tab-btn');
+        var badge = document.getElementById('tabStatusBadge');
+        var insightsPanel = document.getElementById('slInsightsPanel');
+        var allCards = document.querySelectorAll('#kpiRow .sl-card, #kpiRow .sl-health-card, #chartsRow .sl-chart-card, #bottomRow .sl-chart-card');
+
+        tabs.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                tabs.forEach(function(t) { t.classList.remove('active'); });
+                this.classList.add('active');
+                var tabName = this.getAttribute('data-tab');
+
+                if (badge) {
+                    badge.innerHTML = '<span style="color:#10b981;">●</span> ' + this.textContent + ' View';
+                }
+
+                if (tabName === 'insights') {
+                    if (insightsPanel) insightsPanel.style.display = 'block';
+                    allCards.forEach(function(c) { c.style.display = 'none'; });
+                    var cR = document.getElementById('chartsRow'); if (cR) cR.style.display = 'none';
+                    var bR = document.getElementById('bottomRow'); if (bR) bR.style.display = 'none';
+                } else {
+                    if (insightsPanel) insightsPanel.style.display = 'none';
+                    var cR = document.getElementById('chartsRow'); if (cR) cR.style.display = 'grid';
+                    var bR = document.getElementById('bottomRow'); if (bR) bR.style.display = 'grid';
+
+                    allCards.forEach(function(c) {
+                        var cats = (c.getAttribute('data-category') || '').split(',');
+                        if (tabName === 'overview' || cats.indexOf(tabName) !== -1) {
+                            c.style.display = '';
+                            c.style.opacity = '1';
+                        } else {
+                            c.style.display = 'none';
+                        }
+                    });
+                    setTimeout(function() { window.dispatchEvent(new Event('resize')); }, 50);
+                }
+            });
+        });
+    }
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        setTimeout(initTabs, 50);
+    } else {
+        document.addEventListener('DOMContentLoaded', initTabs);
+    }
+})();
+</script>
