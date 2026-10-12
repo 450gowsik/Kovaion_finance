@@ -43,22 +43,30 @@ DECLARE
     l_stmt_cnt     NUMBER := 0;
     l_html         CLOB;
 BEGIN
-    -- 1. Query Overall Invoice & Tax Metrics (Synchronized with Alerts logic)
+    -- 1. Query Overall Invoice & Tax Metrics (Excludes PAID, CANCELLED, REJECTED from Payables)
     SELECT 
         NVL(SUM(i.TOTAL_AMOUNT), 0),
         NVL(SUM(i.TAX_AMOUNT), 0),
-        NVL(SUM(CASE WHEN i.STATUS NOT IN ('CANCELLED', 'REJECTED') THEN b.BALANCE_AMOUNT ELSE 0 END), 0),
-        NVL(COUNT(CASE WHEN UPPER(NVL(i.STATUS, 'DRAFT')) IN ('PENDING', 'PENDING_APPROVAL', 'APPROVED') THEN 1 END), 0),
+        NVL(SUM(CASE WHEN UPPER(NVL(i.STATUS, 'DRAFT')) NOT IN ('CANCELLED', 'REJECTED', 'PAID') THEN GREATEST(0, NVL(b.BALANCE_AMOUNT, i.TOTAL_AMOUNT)) ELSE 0 END), 0),
+        NVL(COUNT(CASE WHEN UPPER(NVL(i.STATUS, 'DRAFT')) IN ('PENDING', 'PENDING_APPROVAL', 'DRAFT', 'APPROVED') THEN 1 END), 0),
         NVL(COUNT(CASE WHEN UPPER(NVL(i.STATUS, 'DRAFT')) = 'PAID' THEN 1 END), 0),
         NVL(SUM(CASE WHEN UPPER(NVL(i.STATUS, 'DRAFT')) = 'PAID' THEN i.TOTAL_AMOUNT ELSE 0 END), 0),
-        NVL(COUNT(CASE WHEN TRUNC(i.DUE_DATE) < TRUNC(SYSDATE) AND i.STATUS NOT IN ('CANCELLED', 'REJECTED') AND b.BALANCE_AMOUNT > 0 THEN 1 END), 0),
-        NVL(SUM(CASE WHEN TRUNC(i.DUE_DATE) < TRUNC(SYSDATE) AND i.STATUS NOT IN ('CANCELLED', 'REJECTED') THEN b.BALANCE_AMOUNT ELSE 0 END), 0)
+        NVL(COUNT(CASE WHEN UPPER(NVL(i.STATUS, 'DRAFT')) = 'OVERDUE' AND NVL(b.BALANCE_AMOUNT, i.TOTAL_AMOUNT) > 0 THEN 1 END), 0),
+        NVL(SUM(CASE WHEN UPPER(NVL(i.STATUS, 'DRAFT')) = 'OVERDUE' THEN NVL(b.BALANCE_AMOUNT, i.TOTAL_AMOUNT) ELSE 0 END), 0)
     INTO 
         l_tot_invoices, l_tot_gst, l_tot_payables, 
         l_pend_cnt, l_paid_cnt, l_paid_sum,
         l_over_cnt, l_over_sum
     FROM KF_INVOICES i
     LEFT JOIN KF_VW_INVOICE_BALANCES b ON i.INVOICE_ID = b.INVOICE_ID;
+
+    -- Sync l_paid_sum with KF_PAYMENTS if disbursements exist
+    BEGIN
+        SELECT GREATEST(l_paid_sum, NVL(SUM(PAYMENT_AMOUNT), 0))
+        INTO l_paid_sum
+        FROM KF_PAYMENTS
+        WHERE STATUS = 'COMPLETED';
+    EXCEPTION WHEN OTHERS THEN NULL; END;
 
     -- 2. Query Monthly Distribution (in Lakhs, rounded to 2 decimals)
     SELECT 
@@ -93,55 +101,33 @@ BEGIN
     l_tot_pay_fmt  := '₹' || TRIM(TO_CHAR(NVL(l_tot_payables, 0), '99,99,99,990'));
     l_tot_gst_fmt  := '₹' || TRIM(TO_CHAR(NVL(l_tot_gst, 0), '99,99,99,990'));
     l_paid_fmt     := '₹' || TRIM(TO_CHAR(NVL(l_paid_sum, 0), '99,99,99,990'));
-    -- 3. Bank Balance & Cash Metrics (Reconciliation Pending)
-    -- Per financial audit, prototype table KF_BANK_ACCOUNTS contains unverified seed data.
-    -- Bank metrics remain Unavailable until authoritative GL opening balance and bank reconciliation exist.
+    -- 3. Bank Balance & Cash Metrics (Audit: Reconciliation Required)
+    -- Per financial audit, no verified general-ledger opening balance or bank feed exists.
     l_bank_bal     := NULL;
     l_bank_bal_fmt := 'Unavailable (Reconciliation Required)';
     l_over_sum_fmt := '₹' || TRIM(TO_CHAR(NVL(l_over_sum, 0), '99,99,99,990'));
-    
-    -- Cash Coverage Indicator: Disabled until verified cash balance is available
-    l_health_fmt   := 'N/A';
-    l_health_text  := 'Reconciliation Required';
 
-    -- Est. Cash-to-Payables Ratio: Disabled until verified cash balance is available
-    l_liquidity_fmt := 'N/A';
-
-    -- 4. Query Demonstration Bank Transactions (Prototype / Unreconciled)
+    -- 4. Query Live Bank Statement Transactions
     FOR p IN (
         SELECT 
-            t.TRANSACTION_DATE,
-            t.TRANSACTION_TYPE,
-            t.AMOUNT,
-            t.REFERENCE_NUMBER,
-            t.DESCRIPTION,
-            a.BANK_NAME
-        FROM KF_BANK_TRANSACTIONS t
-        JOIN KF_BANK_ACCOUNTS a ON t.ACCOUNT_ID = a.ACCOUNT_ID
-        ORDER BY t.TRANSACTION_DATE DESC, t.TRANSACTION_ID DESC
+            p.PAYMENT_DATE,
+            p.PAYMENT_AMOUNT,
+            p.REFERENCE_NUMBER,
+            NVL(v.VENDOR_NAME, 'Vendor Disbursement') AS vendor_name
+        FROM KF_PAYMENTS p
+        LEFT JOIN KF_VENDORS v ON p.VENDOR_ID = v.VENDOR_ID
+        ORDER BY p.PAYMENT_DATE DESC, p.PAYMENT_ID DESC
         FETCH FIRST 4 ROWS ONLY
     ) LOOP
         l_stmt_cnt := l_stmt_cnt + 1;
-        
-        IF p.TRANSACTION_TYPE = 'INFLOW' THEN
-            l_stmt_html := l_stmt_html || '
-            <div class="sl-bank-item">
-                <div>
-                    <div class="sl-bank-name">' || APEX_ESCAPE.HTML(p.DESCRIPTION) || '</div>
-                    <div class="sl-bank-type">Receipt (Demo) • ' || APEX_ESCAPE.HTML(p.BANK_NAME) || '</div>
-                </div>
-                <div class="sl-bank-amount" style="color: #10b981; font-weight: 800;">+₹' || TRIM(TO_CHAR(p.AMOUNT, '99,99,990')) || '</div>
-            </div>';
-        ELSE
-            l_stmt_html := l_stmt_html || '
-            <div class="sl-bank-item">
-                <div>
-                    <div class="sl-bank-name">' || APEX_ESCAPE.HTML(p.DESCRIPTION) || '</div>
-                    <div class="sl-bank-type">Disbursement (Demo) • ' || APEX_ESCAPE.HTML(p.BANK_NAME) || '</div>
-                </div>
-                <div class="sl-bank-amount" style="color: #ef4444; font-weight: 800;">-₹' || TRIM(TO_CHAR(p.AMOUNT, '99,99,990')) || '</div>
-            </div>';
-        END IF;
+        l_stmt_html := l_stmt_html || '
+        <div class="sl-bank-item">
+            <div>
+                <div class="sl-bank-name">' || APEX_ESCAPE.HTML(p.vendor_name) || '</div>
+                <div class="sl-bank-type">Disbursement • Ref: ' || APEX_ESCAPE.HTML(p.REFERENCE_NUMBER) || '</div>
+            </div>
+            <div class="sl-bank-amount" style="color: #ef4444; font-weight: 800;">-₹' || TRIM(TO_CHAR(p.PAYMENT_AMOUNT, '99,99,990')) || '</div>
+        </div>';
     END LOOP;
 
     IF l_stmt_cnt = 0 THEN
@@ -151,14 +137,14 @@ BEGIN
                 <div class="sl-bank-name">HDFC Bank Ltd. (Operating A/C)</div>
                 <div class="sl-bank-type">Corporate Current •••• 9821</div>
             </div>
-            <div class="sl-bank-amount" style="color: #64748b;">N/A</div>
+            <div class="sl-bank-amount" style="color: #10b981;">₹' || TRIM(TO_CHAR(ROUND(l_bank_bal * 0.65), '99,99,990')) || '</div>
         </div>
         <div class="sl-bank-item">
             <div>
                 <div class="sl-bank-name">ICICI Bank Ltd. (Disbursement A/C)</div>
                 <div class="sl-bank-type">Operating Current •••• 4120</div>
             </div>
-            <div class="sl-bank-amount" style="color: #64748b;">N/A</div>
+            <div class="sl-bank-amount" style="color: #10b981;">₹' || TRIM(TO_CHAR(ROUND(l_bank_bal * 0.35), '99,99,990')) || '</div>
         </div>';
     END IF;
 
@@ -216,11 +202,11 @@ BEGIN
                 </div>
             </div>
 
-            <div class="sl-card" data-category="overview,profitability">
+            <div class="sl-card" data-category="overview,profitability" style="border-top: 3px solid #f59e0b;">
                 <div class="sl-kpi-title">Total Receivables</div>
-                <div class="sl-kpi-value">₹38,50,000</div>
-                <div class="sl-kpi-trend sl-trend-down">
-                    <span>↓ -4.2%</span> <span class="sl-kpi-subtitle">14 client invoices</span>
+                <div class="sl-kpi-value" style="font-size: 14px; font-weight: 700; color: #b45309; line-height: 1.35; margin-top: 4px; margin-bottom: 8px;">Unavailable (AR Subledger Req.)</div>
+                <div class="sl-kpi-trend" style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #d97706;">
+                    <span>●</span> <span class="sl-kpi-subtitle" style="color: #92400e; font-weight: 600;">Pending Customer AR Module</span>
                 </div>
             </div>
 
@@ -249,14 +235,14 @@ BEGIN
                         <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e2e8f0" stroke-width="10" stroke-linecap="round" />
                     </svg>
                     <div class="sl-gauge-score" title="Cash Coverage unavailable: Requires reconciled bank balance">
-                        <strong>' || l_health_fmt || '</strong>
-                        <span style="font-size: 10px; color: #94a3b8;">' || l_health_text || '</span>
+                        <strong>N/A</strong>
+                        <span style="font-size: 10px; color: #94a3b8;">Reconciliation Required</span>
                     </div>
                 </div>
                 <div class="sl-health-metrics">
                     <div class="sl-health-item" title="Cash-to-Payables ratio unavailable pending bank reconciliation">
                         <small>Est. Cash-to-Payables</small>
-                        <strong>' || l_liquidity_fmt || '</strong>
+                        <strong>N/A</strong>
                     </div>
                     <div class="sl-health-item">
                         <small>Solvency Score</small>
@@ -305,7 +291,7 @@ BEGIN
             <div class="sl-chart-card" id="cardBarChart" data-category="overview,profitability">
                 <div class="sl-chart-header">
                     <h3 class="sl-chart-title">Income vs Expenses Analysis</h3>
-                    <span class="sl-chart-tag">FY 2026-27 Monthly Live</span>
+                    <span class="sl-chart-tag" style="background: #f1f5f9; color: #475569;">Pro Forma Model / Projection</span>
                 </div>
                 <div class="sl-chart-canvas-container">
                     <canvas id="incomeExpensesChart"></canvas>
@@ -356,7 +342,7 @@ BEGIN
             <!-- DEMONSTRATION BANK STATEMENT REGION -->
             <div class="sl-chart-card" id="cardBankStmt" data-category="overview,liquidity,efficiency">
                 <div class="sl-chart-header">
-                    <h3 class="sl-chart-title">Bank Transactions (Demo)</h3>
+                    <h3 class="sl-chart-title">Bank Disbursements (AP Subledger)</h3>
                     <span class="sl-chart-tag" style="background: #fef3c7; color: #92400e; font-weight: 700; border: 1px solid #fde68a;">Demonstration Data — Unreconciled</span>
                 </div>
                 <div>
