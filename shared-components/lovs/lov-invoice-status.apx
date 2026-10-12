@@ -1,0 +1,11 @@
+lov lov-invoice-status (
+    name: LOV_INVOICE_STATUS
+    source {
+        tableName: KF_INVOICE_STATUS_LOV
+    }
+    columnMapping {
+        return: STATUS_CODE
+        display: STATUS_NAME
+        defaultSort: STATUS_NAME
+    }
+)

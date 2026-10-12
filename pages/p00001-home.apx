@@ -563,11 +563,11 @@ page 1 (
                     <!-- Row 1 & 2: Top 8 KPI Cards + Company Health Gauge -->
                     <div class="sl-kpi-row">
                         <!-- Top 4 KPIs -->
-                        <div class="sl-card">
+                        <div class="sl-card" style="border-top: 3px solid #f59e0b;">
                             <div class="sl-kpi-title">Total Bank Balance</div>
-                            <div class="sl-kpi-value">₹1,24,20,000</div>
-                            <div class="sl-kpi-trend sl-trend-up">
-                                <span>↑ +12.4%</span> <span class="sl-kpi-subtitle">vs last month</span>
+                            <div class="sl-kpi-value" style="font-size: 14px; font-weight: 700; color: #b45309; line-height: 1.35; margin-top: 4px; margin-bottom: 8px;">Unavailable (Reconciliation Required)</div>
+                            <div class="sl-kpi-trend" style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #d97706;">
+                                <span>●</span> <span class="sl-kpi-subtitle" style="color: #92400e; font-weight: 600;">Pending Bank Reconciliation</span>
                             </div>
                         </div>
 
@@ -595,33 +595,26 @@ page 1 (
                             </div>
                         </div>
 
-                        <!-- Company Health Gauge (Spans 2 rows on right) -->
+                        <!-- Cash Coverage Gauge -->
                         <div class="sl-health-card">
-                            <div class="sl-health-title">Company Financial Health</div>
+                            <div class="sl-health-title">Cash Coverage Indicator</div>
                             <div class="sl-gauge-wrapper">
                                 <svg class="sl-gauge-svg" viewBox="0 0 100 55">
                                     <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e2e8f0" stroke-width="10" stroke-linecap="round" />
-                                    <path d="M 10 50 A 40 40 0 0 1 80 22" fill="none" stroke="url(#gaugeGradient)" stroke-width="10" stroke-linecap="round" />
-                                    <defs>
-                                        <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                            <stop offset="0%" stop-color="#10b981" />
-                                            <stop offset="100%" stop-color="#059669" />
-                                        </linearGradient>
-                                    </defs>
                                 </svg>
                                 <div class="sl-gauge-score">
-                                    <strong>88</strong>
-                                    <span>EXCELLENT</span>
+                                    <strong>N/A</strong>
+                                    <span style="font-size: 10px; color: #94a3b8;">Reconciliation Required</span>
                                 </div>
                             </div>
                             <div class="sl-health-metrics">
                                 <div class="sl-health-item">
-                                    <small>Liquidity Ratio</small>
-                                    <strong>2.4x (Safe)</strong>
+                                    <small>Est. Cash-to-Payables</small>
+                                    <strong>N/A</strong>
                                 </div>
                                 <div class="sl-health-item">
                                     <small>Solvency Score</small>
-                                    <strong>A+ Grade</strong>
+                                    <strong style="font-size:11px; color:#64748b; font-weight:normal; display:block; line-height:1.2; margin-top:2px;">Not Available<br/>(Balance Sheet Req.)</strong>
                                 </div>
                             </div>
                         </div>
@@ -717,8 +710,8 @@ page 1 (
                         <!-- Bank Accounts & Balances -->
                         <div class="sl-chart-card">
                             <div class="sl-chart-header">
-                                <h3 class="sl-chart-title">Accounts &amp; Balances</h3>
-                                <span class="sl-chart-tag">Live Balances</span>
+                                <h3 class="sl-chart-title">Accounts &amp; Balances (Demo)</h3>
+                                <span class="sl-chart-tag" style="background: #fef3c7; color: #92400e; font-weight: 700; border: 1px solid #fde68a;">Demonstration Data — Unreconciled</span>
                             </div>
                             <div>
                                 <div class="sl-bank-item">

@@ -9,6 +9,9 @@ page 51 (
     dialog {
         chained: false
     }
+    navigation {
+        warnOnUnsavedChanges: false
+    }
 
     region buttons (
         name: Buttons
@@ -144,6 +147,7 @@ page 51 (
         }
         behavior {
             action: submitPage
+            warnOnUnsavedChanges: doNotCheck
         }
     )
 

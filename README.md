@@ -304,13 +304,13 @@ Kovaion_Finance/
 - On-screen summary of processed rows, skipped rows, and validation exceptions.
 
 ### Page 40: Financial & Statutory Reports
-- Real-time balances and aging analysis derived from `KF_VW_INVOICE_BALANCES`.
-- Statutory TDS reporting organized by tax section for quarterly reconciliation.
-- Monthly cashflow inflows versus outflows.
+- **11-Card Report Grid**: Comprehensive suite covering TDS, GST, Payables, Vendors, Cash Flow, Exceptions, and Reconciliations.
+- **Live CSV Export Engine**: Custom PL/SQL interception dynamically queries `KF_INVOICES` and securely streams live data directly to CSV format via interactive Excel/PDF buttons, bypassing APEX UI rendering overhead.
 
 ### Page 50: Payments & Disbursements
-- Consolidated register tracking payment dates, payment modes (Bank Transfer, Cheque, NEFT), transaction references, and settlement statuses.
-- Modal launcher linking directly to Page 51 for recording new disbursements against outstanding balances.
+- **World-Class SaaS UI:** Features a highly premium, modern aesthetic utilizing custom CSS (floating rows, glassmorphism badges, gradient text, and animated workflow steppers) styled in Times New Roman.
+- **Dynamic Visualizations:** Integrated `Chart.js` components rendering live "Top Vendors by Volume" (Doughnut) and "Payment Pipeline" (Bar) charts.
+- **Workflow Tracking:** Real-time financial metric cards (Total Payable, Due Today, Due This Week, Overdue) and consolidated registers tracking payment lifecycle (Approved ➔ Scheduled ➔ Processing ➔ Completed).
 
 ---
 

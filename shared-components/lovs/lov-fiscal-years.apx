@@ -1,0 +1,11 @@
+lov lov-fiscal-years (
+    name: LOV_FISCAL_YEARS
+    source {
+        tableName: KF_FISCAL_YEARS
+    }
+    columnMapping {
+        return: FISCAL_YEAR_ID
+        display: FISCAL_YEAR_CODE
+        defaultSort: FISCAL_YEAR_CODE
+    }
+)

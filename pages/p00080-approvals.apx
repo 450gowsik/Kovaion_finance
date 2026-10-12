@@ -1,0 +1,35 @@
+page 80 (
+    name: Approvals
+    alias: APPROVALS
+    title: "Approvals - Kovaion Finance"
+    appearance {
+        pageTemplate: @/standard
+        templateOptions: #DEFAULT#
+    }
+    navigation {
+        cursorFocus: doNotFocusCursor
+    }
+
+    region approvals-main (
+        name: Approvals
+        type: staticContent
+        source {
+            htmlCode:
+                ```html
+                <div style="padding: 24px; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0;">
+                    <h2 style="font-size: 20px; font-weight: 700; color: #0f172a; margin-top: 0;">Multi-Level Invoice &amp; Payment Approvals</h2>
+                    <p style="color: #64748b; font-size: 14px;">Review pending approval requests, verify document thresholds, and authorize disbursements.</p>
+                </div>
+                ```
+        }
+        layout {
+            sequence: 10
+            slot: body
+        }
+        appearance {
+            template: @/standard
+            templateOptions: #DEFAULT#
+        }
+    )
+
+)

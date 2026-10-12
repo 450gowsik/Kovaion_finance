@@ -1,0 +1,245 @@
+/* 
+STEP 1: PASTE THIS INTO PAGE PROPERTIES -> CSS -> INLINE 
+*/
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+.kanakku-invoices-page {
+    font-family: 'Times New Roman', Times, serif;
+    padding: 10px;
+}
+
+/* Ultra-Premium KPI Cards Grid */
+.knk-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 24px;
+    margin-bottom: 30px;
+}
+
+/* Base Card Styling */
+.knk-kpi-card {
+    border-radius: 24px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    color: white;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.knk-kpi-card:hover {
+    transform: translateY(-8px) scale(1.02);
+}
+
+/* Beautiful Rich Gradients & Glowing Shadows */
+.knk-kpi-card:nth-child(1) {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.5);
+}
+.knk-kpi-card:nth-child(2) {
+    background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+    box-shadow: 0 20px 40px -10px rgba(245, 158, 11, 0.5);
+}
+.knk-kpi-card:nth-child(3) {
+    background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+    box-shadow: 0 20px 40px -10px rgba(14, 165, 233, 0.5);
+}
+.knk-kpi-card:nth-child(4) {
+    background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+    box-shadow: 0 20px 40px -10px rgba(244, 63, 94, 0.5);
+}
+.knk-kpi-card:nth-child(5) {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    box-shadow: 0 20px 40px -10px rgba(16, 185, 129, 0.5);
+}
+.knk-kpi-card:nth-child(6) {
+    background: linear-gradient(135deg, #64748b 0%, #334155 100%);
+    box-shadow: 0 20px 40px -10px rgba(100, 116, 139, 0.5);
+}
+
+/* Glassmorphism Frosted Icon Container */
+.knk-kpi-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: white !important;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+/* Typography for Dark Backgrounds */
+.knk-kpi-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    position: relative;
+    z-index: 2; /* Keep above watermark */
+}
+.knk-kpi-label {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+.knk-kpi-val {
+    color: #ffffff;
+    font-size: 36px;
+    font-weight: 800;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+/* Decorative Watermark Circles */
+.knk-kpi-card::after {
+    content: '';
+    position: absolute;
+    right: -20px;
+    bottom: -30px;
+    width: 140px;
+    height: 140px;
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+    border-radius: 50%;
+    z-index: 1;
+}
+.knk-kpi-card::before {
+    content: '';
+    position: absolute;
+    right: 60px;
+    bottom: 60px;
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    z-index: 1;
+}
+
+/* ==============================================================
+   ULTRA-PREMIUM TABLE (INTERACTIVE REPORT) OVERRIDES 
+   ============================================================== */
+.a-IRR-table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    font-family: 'Times New Roman', Times, serif !important;
+    background: #ffffff !important;
+}
+
+/* Table Header */
+.a-IRR-header {
+    background: #f1f5f9 !important; 
+    color: #64748b !important; 
+    font-weight: 700 !important; 
+    font-size: 12px !important; 
+    letter-spacing: 0.5px !important;
+    text-transform: uppercase !important;
+    padding: 16px 20px !important;
+    border: none !important;
+    border-bottom: 2px solid #e2e8f0 !important;
+}
+.a-IRR-header:first-child { border-top-left-radius: 12px !important; }
+.a-IRR-header:last-child { border-top-right-radius: 12px !important; }
+.a-IRR-headerLink { color: #64748b !important; }
+
+/* Table Rows & Cells */
+.a-IRR-dataRow td {
+    padding: 16px 20px !important;
+    vertical-align: middle !important;
+    font-size: 14px !important;
+    color: #334155 !important;
+    border: none !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    transition: background-color 0.2s ease !important;
+}
+
+/* Row Hover Effect */
+.a-IRR-dataRow:hover td {
+    background-color: #f8fafc !important;
+    cursor: pointer !important;
+}
+
+/* Remove ugly borders from the wrapper */
+.a-IRR {
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+}
+
+/* Style the Toolbar and Search Bar */
+.a-IRR-toolbar {
+    background: #ffffff !important;
+    border: none !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    padding: 12px 20px !important;
+}
+.a-IRR-search-field {
+    border-radius: 20px !important;
+    border: 1px solid #cbd5e1 !important;
+    padding: 6px 16px !important;
+    font-family: 'Times New Roman', Times, serif !important;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.05) !important;
+}
+.a-IRR-search-field:focus {
+    border-color: #6366f1 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+}
+
+/* Status Badges */
+.badge-PAID { background: #dcfce7; color: #166534; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+.badge-PENDING_APPROVAL { background: #fef3c7; color: #92400e; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+.badge-APPROVED { background: #e0e7ff; color: #3730a3; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+.badge-OVERDUE { background: #fee2e2; color: #991b1b; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+.badge-DRAFT { background: #f1f5f9; color: #475569; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+
+/* Dynamic Action Link Buttons */
+.knk-btn-approve { display: inline-flex; align-items: center; justify-content: center; background:#ecfdf5; border:1px solid #10b981; color:#059669; border-radius:6px; padding:6px 12px; text-decoration:none; font-size:12px; font-weight:600; box-shadow:0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s; margin-right: 8px;}
+.knk-btn-approve:hover { background:#d1fae5; border-color:#059669; color:#047857; transform: translateY(-1px); }
+
+.knk-btn-reject { display: inline-flex; align-items: center; justify-content: center; background:#fef2f2; border:1px solid #ef4444; color:#dc2626; border-radius:6px; padding:6px 12px; text-decoration:none; font-size:12px; font-weight:600; box-shadow:0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s; margin-right: 8px;}
+.knk-btn-reject:hover { background:#fee2e2; border-color:#dc2626; color:#b91c1c; transform: translateY(-1px); }
+
+.knk-btn-pay { display: inline-flex; align-items: center; justify-content: center; background:#eff6ff; border:1px solid #3b82f6; color:#2563eb; border-radius:6px; padding:6px 12px; text-decoration:none; font-size:12px; font-weight:600; box-shadow:0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s; margin-right: 8px;}
+.knk-btn-pay:hover { background:#dbeafe; border-color:#2563eb; color:#1d4ed8; transform: translateY(-1px); }
+
+.knk-btn-more { display: inline-flex; align-items: center; justify-content: center; background:#f8fafc; border:1px solid #cbd5e1; color:#475569; border-radius:6px; padding:6px 12px; text-decoration:none; font-size:12px; font-weight:600; box-shadow:0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s; }
+.knk-btn-more:hover { background:#f1f5f9; border-color:#94a3b8; color:#334155; transform: translateY(-1px); }
+
+
+.action-buttons .knk-btn-approve, .action-buttons .knk-btn-reject, .action-buttons .knk-btn-pay, .action-buttons .knk-btn-more { display: none; }
+.action-buttons.state-PENDING .knk-btn-approve, .action-buttons.state-PENDING .knk-btn-reject { display: inline-flex; margin-right: 8px; }
+.action-buttons.state-APPROVED .knk-btn-pay { display: inline-flex; }
+.action-buttons.state-OTHER .knk-btn-more { display: inline-flex; }
+
+/* Hide and Show Buttons Based on Status */
+.action-buttons .knk-btn-approve, .action-buttons .knk-btn-reject, .action-buttons .knk-btn-pay { display: none !important; }
+.action-buttons.state-PENDING .knk-btn-approve, .action-buttons.state-PENDING .knk-btn-reject { display: inline-flex !important; }
+.action-buttons.state-APPROVED .knk-btn-pay { display: inline-flex !important; }
+
+/* ============================================================== 
+   FINANCIAL REPORTS GRID STYLING 
+   ============================================================== */ 
+.knk-report-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; padding: 20px 0; } 
+.knk-report-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; transition: all 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); display: flex; flex-direction: column; justify-content: space-between; } 
+.knk-report-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); border-color: #cbd5e1; } 
+.knk-rc-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; } 
+.knk-rc-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; } 
+.knk-rc-info h3 { margin: 0 0 4px 0; font-size: 16px; font-weight: 700; color: #1e293b; font-family: 'Times New Roman', Times, serif; } 
+.knk-rc-info p { margin: 0; font-size: 13px; color: #64748b; line-height: 1.4; } 
+.knk-rc-actions { display: flex; gap: 8px; align-items: center; } 
+.knk-rc-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'Times New Roman', Times, serif; border: none; }
+.knk-rc-btn.outline { background: #ffffff; border: 1px solid #e2e8f0; color: #475569; } 
+.knk-rc-btn.outline:hover { background: #f8fafc; border-color: #cbd5e1; color: #1e293b; } 
+.knk-rc-btn.primary { background: #1e3a8a; color: #ffffff; flex-grow: 1; } 
+.knk-rc-btn.primary:hover { background: #1e40af; box-shadow: 0 4px 6px -1px rgba(30, 58, 138, 0.2); } 
+.bg-light-purple { background: #f3e8ff; color: #9333ea; } 
+.bg-light-blue { background: #e0f2fe; color: #0284c7; } 
+.bg-light-orange { background: #ffedd5; color: #ea580c; } 
+.bg-light-green { background: #dcfce7; color: #16a34a; } 
+.bg-light-red { background: #fee2e2; color: #dc2626; }

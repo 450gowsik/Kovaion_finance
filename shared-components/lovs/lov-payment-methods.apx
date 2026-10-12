@@ -1,0 +1,11 @@
+lov lov-payment-methods (
+    name: LOV_PAYMENT_METHODS
+    source {
+        tableName: KF_PAYMENT_METHODS_LOV
+    }
+    columnMapping {
+        return: METHOD_CODE
+        display: METHOD_NAME
+        defaultSort: METHOD_NAME
+    }
+)

@@ -33,26 +33,32 @@ DECLARE
     l_tot_gst_fmt  VARCHAR2(50);
     l_paid_fmt     VARCHAR2(50);
     l_bank_bal_fmt VARCHAR2(50);
-    l_bank_bal     NUMBER := 12420000;
-    l_stmt_html    CLOB := '';
+    l_bank_bal     NUMBER := NULL; -- Hard-coded fallback removed; pending finance reconciliation
+    l_over_sum_fmt  VARCHAR2(50);
+    l_health_score  NUMBER := 0;
+    l_health_fmt    VARCHAR2(20);
+    l_health_text   VARCHAR2(50);
+    l_liquidity_fmt VARCHAR2(20);
+    l_stmt_html     CLOB := '';
     l_stmt_cnt     NUMBER := 0;
     l_html         CLOB;
 BEGIN
-    -- 1. Query Overall Invoice & Tax Metrics
+    -- 1. Query Overall Invoice & Tax Metrics (Synchronized with Alerts logic)
     SELECT 
-        NVL(SUM(TOTAL_AMOUNT), 0),
-        NVL(SUM(TAX_AMOUNT), 0),
-        NVL(SUM(CASE WHEN STATUS IN ('PENDING', 'PENDING_APPROVAL', 'APPROVED', 'OVERDUE') THEN TOTAL_AMOUNT ELSE 0 END), 0),
-        NVL(COUNT(CASE WHEN STATUS IN ('PENDING', 'PENDING_APPROVAL', 'APPROVED') THEN 1 END), 0),
-        NVL(COUNT(CASE WHEN STATUS = 'PAID' THEN 1 END), 0),
-        NVL(SUM(CASE WHEN STATUS = 'PAID' THEN TOTAL_AMOUNT ELSE 0 END), 0),
-        NVL(COUNT(CASE WHEN STATUS = 'OVERDUE' THEN 1 END), 0),
-        NVL(SUM(CASE WHEN STATUS = 'OVERDUE' THEN TOTAL_AMOUNT ELSE 0 END), 0)
+        NVL(SUM(i.TOTAL_AMOUNT), 0),
+        NVL(SUM(i.TAX_AMOUNT), 0),
+        NVL(SUM(CASE WHEN i.STATUS NOT IN ('CANCELLED', 'REJECTED') THEN b.BALANCE_AMOUNT ELSE 0 END), 0),
+        NVL(COUNT(CASE WHEN UPPER(NVL(i.STATUS, 'DRAFT')) IN ('PENDING', 'PENDING_APPROVAL', 'APPROVED') THEN 1 END), 0),
+        NVL(COUNT(CASE WHEN UPPER(NVL(i.STATUS, 'DRAFT')) = 'PAID' THEN 1 END), 0),
+        NVL(SUM(CASE WHEN UPPER(NVL(i.STATUS, 'DRAFT')) = 'PAID' THEN i.TOTAL_AMOUNT ELSE 0 END), 0),
+        NVL(COUNT(CASE WHEN TRUNC(i.DUE_DATE) < TRUNC(SYSDATE) AND i.STATUS NOT IN ('CANCELLED', 'REJECTED') AND b.BALANCE_AMOUNT > 0 THEN 1 END), 0),
+        NVL(SUM(CASE WHEN TRUNC(i.DUE_DATE) < TRUNC(SYSDATE) AND i.STATUS NOT IN ('CANCELLED', 'REJECTED') THEN b.BALANCE_AMOUNT ELSE 0 END), 0)
     INTO 
         l_tot_invoices, l_tot_gst, l_tot_payables, 
         l_pend_cnt, l_paid_cnt, l_paid_sum,
         l_over_cnt, l_over_sum
-    FROM KF_INVOICES;
+    FROM KF_INVOICES i
+    LEFT JOIN KF_VW_INVOICE_BALANCES b ON i.INVOICE_ID = b.INVOICE_ID;
 
     -- 2. Query Monthly Distribution (in Lakhs, rounded to 2 decimals)
     SELECT 
@@ -87,30 +93,55 @@ BEGIN
     l_tot_pay_fmt  := '₹' || TRIM(TO_CHAR(NVL(l_tot_payables, 0), '99,99,99,990'));
     l_tot_gst_fmt  := '₹' || TRIM(TO_CHAR(NVL(l_tot_gst, 0), '99,99,99,990'));
     l_paid_fmt     := '₹' || TRIM(TO_CHAR(NVL(l_paid_sum, 0), '99,99,99,990'));
-    l_bank_bal     := GREATEST(5000000, 12420000 - l_paid_sum);
-    l_bank_bal_fmt := '₹' || TRIM(TO_CHAR(l_bank_bal, '99,99,99,990'));
+    -- 3. Bank Balance & Cash Metrics (Reconciliation Pending)
+    -- Per financial audit, prototype table KF_BANK_ACCOUNTS contains unverified seed data.
+    -- Bank metrics remain Unavailable until authoritative GL opening balance and bank reconciliation exist.
+    l_bank_bal     := NULL;
+    l_bank_bal_fmt := 'Unavailable (Reconciliation Required)';
+    l_over_sum_fmt := '₹' || TRIM(TO_CHAR(NVL(l_over_sum, 0), '99,99,99,990'));
+    
+    -- Cash Coverage Indicator: Disabled until verified cash balance is available
+    l_health_fmt   := 'N/A';
+    l_health_text  := 'Reconciliation Required';
 
-    -- 3. Query Live Bank Statement Transactions
+    -- Est. Cash-to-Payables Ratio: Disabled until verified cash balance is available
+    l_liquidity_fmt := 'N/A';
+
+    -- 4. Query Demonstration Bank Transactions (Prototype / Unreconciled)
     FOR p IN (
         SELECT 
-            p.PAYMENT_DATE,
-            p.PAYMENT_AMOUNT,
-            p.REFERENCE_NUMBER,
-            NVL(v.VENDOR_NAME, 'Vendor Payment') AS vendor_name
-        FROM KF_PAYMENTS p
-        LEFT JOIN KF_VENDORS v ON p.VENDOR_ID = v.VENDOR_ID
-        ORDER BY p.PAYMENT_DATE DESC, p.PAYMENT_ID DESC
+            t.TRANSACTION_DATE,
+            t.TRANSACTION_TYPE,
+            t.AMOUNT,
+            t.REFERENCE_NUMBER,
+            t.DESCRIPTION,
+            a.BANK_NAME
+        FROM KF_BANK_TRANSACTIONS t
+        JOIN KF_BANK_ACCOUNTS a ON t.ACCOUNT_ID = a.ACCOUNT_ID
+        ORDER BY t.TRANSACTION_DATE DESC, t.TRANSACTION_ID DESC
         FETCH FIRST 4 ROWS ONLY
     ) LOOP
         l_stmt_cnt := l_stmt_cnt + 1;
-        l_stmt_html := l_stmt_html || '
-        <div class="sl-bank-item">
-            <div>
-                <div class="sl-bank-name">' || APEX_ESCAPE.HTML(p.vendor_name) || '</div>
-                <div class="sl-bank-type">Disbursement • Ref: ' || APEX_ESCAPE.HTML(p.REFERENCE_NUMBER) || '</div>
-            </div>
-            <div class="sl-bank-amount" style="color: #ef4444; font-weight: 800;">-₹' || TRIM(TO_CHAR(p.PAYMENT_AMOUNT, '99,99,990')) || '</div>
-        </div>';
+        
+        IF p.TRANSACTION_TYPE = 'INFLOW' THEN
+            l_stmt_html := l_stmt_html || '
+            <div class="sl-bank-item">
+                <div>
+                    <div class="sl-bank-name">' || APEX_ESCAPE.HTML(p.DESCRIPTION) || '</div>
+                    <div class="sl-bank-type">Receipt (Demo) • ' || APEX_ESCAPE.HTML(p.BANK_NAME) || '</div>
+                </div>
+                <div class="sl-bank-amount" style="color: #10b981; font-weight: 800;">+₹' || TRIM(TO_CHAR(p.AMOUNT, '99,99,990')) || '</div>
+            </div>';
+        ELSE
+            l_stmt_html := l_stmt_html || '
+            <div class="sl-bank-item">
+                <div>
+                    <div class="sl-bank-name">' || APEX_ESCAPE.HTML(p.DESCRIPTION) || '</div>
+                    <div class="sl-bank-type">Disbursement (Demo) • ' || APEX_ESCAPE.HTML(p.BANK_NAME) || '</div>
+                </div>
+                <div class="sl-bank-amount" style="color: #ef4444; font-weight: 800;">-₹' || TRIM(TO_CHAR(p.AMOUNT, '99,99,990')) || '</div>
+            </div>';
+        END IF;
     END LOOP;
 
     IF l_stmt_cnt = 0 THEN
@@ -120,14 +151,14 @@ BEGIN
                 <div class="sl-bank-name">HDFC Bank Ltd. (Operating A/C)</div>
                 <div class="sl-bank-type">Corporate Current •••• 9821</div>
             </div>
-            <div class="sl-bank-amount" style="color: #10b981;">₹' || TRIM(TO_CHAR(ROUND(l_bank_bal * 0.65), '99,99,990')) || '</div>
+            <div class="sl-bank-amount" style="color: #64748b;">N/A</div>
         </div>
         <div class="sl-bank-item">
             <div>
                 <div class="sl-bank-name">ICICI Bank Ltd. (Disbursement A/C)</div>
                 <div class="sl-bank-type">Operating Current •••• 4120</div>
             </div>
-            <div class="sl-bank-amount" style="color: #10b981;">₹' || TRIM(TO_CHAR(ROUND(l_bank_bal * 0.35), '99,99,990')) || '</div>
+            <div class="sl-bank-amount" style="color: #64748b;">N/A</div>
         </div>';
     END IF;
 
@@ -152,10 +183,10 @@ BEGIN
         <!-- SmartInsights AI Summary Panel (Visible on SmartInsights tab) -->
         <div id="slInsightsPanel" style="display:none; margin-bottom: 24px;">
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
-                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #10b981; border-radius: 12px; padding: 18px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
-                    <div style="font-size: 12px; font-weight: 700; color: #10b981; text-transform: uppercase; margin-bottom: 6px;">● Liquidity & Cash Runway</div>
-                    <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">18-Month Operating Runway</div>
-                    <p style="font-size: 13px; color: #64748b; margin: 0; line-height: 1.5;">Total bank balance of <strong>' || l_bank_bal_fmt || '</strong> safely shields ongoing payroll and operations.</p>
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #f59e0b; border-radius: 12px; padding: 18px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+                    <div style="font-size: 12px; font-weight: 700; color: #d97706; text-transform: uppercase; margin-bottom: 6px;">● Liquidity & Cash Runway</div>
+                    <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">Reconciliation Required</div>
+                    <p style="font-size: 13px; color: #64748b; margin: 0; line-height: 1.5;">Total bank balance is <strong>Unavailable (Reconciliation Required)</strong>. Authoritative GL cash ledger required before computing runway.</p>
                 </div>
                 <div style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #4f46e5; border-radius: 12px; padding: 18px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
                     <div style="font-size: 12px; font-weight: 700; color: #4f46e5; text-transform: uppercase; margin-bottom: 6px;">● Payables Health</div>
@@ -177,11 +208,11 @@ BEGIN
 
         <!-- Row 1 & 2: KPI Cards + Company Health Gauge -->
         <div class="sl-kpi-row" id="kpiRow">
-            <div class="sl-card" data-category="overview,liquidity">
+            <div class="sl-card" data-category="overview,liquidity" style="border-top: 3px solid #f59e0b;">
                 <div class="sl-kpi-title">Total Bank Balance</div>
-                <div class="sl-kpi-value">' || l_bank_bal_fmt || '</div>
-                <div class="sl-kpi-trend sl-trend-up">
-                    <span>↑ Live</span> <span class="sl-kpi-subtitle">net of disbursements</span>
+                <div class="sl-kpi-value" style="font-size: 14px; font-weight: 700; color: #b45309; line-height: 1.35; margin-top: 4px; margin-bottom: 8px;">' || l_bank_bal_fmt || '</div>
+                <div class="sl-kpi-trend" style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #d97706;">
+                    <span>●</span> <span class="sl-kpi-subtitle" style="color: #92400e; font-weight: 600;">Pending Bank Reconciliation</span>
                 </div>
             </div>
 
@@ -210,33 +241,26 @@ BEGIN
                 </div>
             </div>
 
-            <!-- Company Health Gauge -->
+            <!-- Cash Coverage Gauge -->
             <div class="sl-health-card" data-category="overview,efficiency">
-                <div class="sl-health-title">Company Financial Health</div>
+                <div class="sl-health-title">Cash Coverage Indicator</div>
                 <div class="sl-gauge-wrapper">
                     <svg class="sl-gauge-svg" viewBox="0 0 100 55">
                         <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e2e8f0" stroke-width="10" stroke-linecap="round" />
-                        <path d="M 10 50 A 40 40 0 0 1 80 22" fill="none" stroke="url(#gaugeGradient)" stroke-width="10" stroke-linecap="round" />
-                        <defs>
-                            <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" stop-color="#10b981" />
-                                <stop offset="100%" stop-color="#059669" />
-                            </linearGradient>
-                        </defs>
                     </svg>
-                    <div class="sl-gauge-score">
-                        <strong>88</strong>
-                        <span>EXCELLENT</span>
+                    <div class="sl-gauge-score" title="Cash Coverage unavailable: Requires reconciled bank balance">
+                        <strong>' || l_health_fmt || '</strong>
+                        <span style="font-size: 10px; color: #94a3b8;">' || l_health_text || '</span>
                     </div>
                 </div>
                 <div class="sl-health-metrics">
-                    <div class="sl-health-item">
-                        <small>Liquidity Ratio</small>
-                        <strong>2.4x (Safe)</strong>
+                    <div class="sl-health-item" title="Cash-to-Payables ratio unavailable pending bank reconciliation">
+                        <small>Est. Cash-to-Payables</small>
+                        <strong>' || l_liquidity_fmt || '</strong>
                     </div>
                     <div class="sl-health-item">
                         <small>Solvency Score</small>
-                        <strong>A+ Grade</strong>
+                        <strong style="font-size:11px; color:#64748b; font-weight:normal; display:block; line-height:1.2; margin-top:2px;">Not Available<br/>(Balance Sheet Req.)</strong>
                     </div>
                 </div>
             </div>
@@ -269,9 +293,9 @@ BEGIN
 
             <div class="sl-card" data-category="overview,liquidity">
                 <div class="sl-kpi-title">Cash Runway</div>
-                <div class="sl-kpi-value">18 Months</div>
-                <div class="sl-kpi-trend sl-trend-up">
-                    <span>↑ +2 mos</span> <span class="sl-kpi-subtitle">at current burn</span>
+                <div class="sl-kpi-value" style="font-size: 15px; color: #64748b; margin-top: 4px;">Pending Reconc.</div>
+                <div class="sl-kpi-trend" style="color: #94a3b8;">
+                    <span>● Requires GL Cash Feed</span>
                 </div>
             </div>
         </div>
@@ -310,30 +334,30 @@ BEGIN
                         <span class="sl-legend-val">' || l_tot_gst_fmt || '</span>
                     </div>
                     <div class="sl-legend-item">
-                        <div class="sl-legend-label"><span class="sl-legend-dot" style="background:#ec4899;"></span>Payroll &amp; Benefits</div>
-                        <span class="sl-legend-val">₹6,00,000</span>
+                        <div class="sl-legend-label"><span class="sl-legend-dot" style="background:#ec4899;"></span>Overdue Invoices</div>
+                        <span class="sl-legend-val">' || l_over_sum_fmt || '</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Row 4: Cash Flow & Live Bank Statement -->
+        <!-- Row 4: Cash Flow & Demonstration Bank Statement -->
         <div class="sl-bottom-row" id="bottomRow">
             <div class="sl-chart-card" id="cardLineChart" data-category="overview,liquidity" style="grid-column: span 2;">
                 <div class="sl-chart-header">
                     <h3 class="sl-chart-title">Net Cash Flow Trend</h3>
-                    <span class="sl-chart-tag">Live Inflow vs Outflow</span>
+                    <span class="sl-chart-tag" style="background: #f1f5f9; color: #475569;">Monthly Projection</span>
                 </div>
                 <div class="sl-chart-canvas-container" style="height: 200px;">
                     <canvas id="cashFlowChart"></canvas>
                 </div>
             </div>
 
-            <!-- LIVE BANK STATEMENT REGION -->
+            <!-- DEMONSTRATION BANK STATEMENT REGION -->
             <div class="sl-chart-card" id="cardBankStmt" data-category="overview,liquidity,efficiency">
                 <div class="sl-chart-header">
-                    <h3 class="sl-chart-title">Live Bank Statement</h3>
-                    <span class="sl-chart-tag" style="background: #dcfce7; color: #15803d; font-weight: 700;">● Live Disbursements</span>
+                    <h3 class="sl-chart-title">Bank Transactions (Demo)</h3>
+                    <span class="sl-chart-tag" style="background: #fef3c7; color: #92400e; font-weight: 700; border: 1px solid #fde68a;">Demonstration Data — Unreconciled</span>
                 </div>
                 <div>
                     ' || l_stmt_html || '
@@ -348,20 +372,41 @@ BEGIN
         var expData = [' || l_exp_apr || ',' || l_exp_may || ',' || l_exp_jun || ',' || l_exp_jul || ',' || l_exp_aug || ',' || l_exp_sep || ',' || l_exp_oct || ',' || l_exp_nov || ',' || l_exp_dec || ',' || l_exp_jan || ',' || l_exp_feb || ',' || l_exp_mar || '];
         var incData = expData.map(function(v) { return Number((v * 1.45 + 1.2).toFixed(2)); });
 
-        function getCleanCanvas(id) {
-            var oldEl = document.getElementById(id);
-            if (!oldEl) return null;
-            try {
-                if (typeof Chart !== "undefined" && Chart.getChart) {
-                    var ch = Chart.getChart(oldEl);
-                    if (ch) ch.destroy();
-                }
-            } catch(e) {}
-            var newEl = oldEl.cloneNode(false);
-            if (oldEl.parentNode) {
-                oldEl.parentNode.replaceChild(newEl, oldEl);
+        window.myKanakkuCharts = window.myKanakkuCharts || {};
+
+        function safelyCreateChart(id, config) {
+            var canvas = document.getElementById(id);
+            if (!canvas) return null;
+            
+            // 1. Destroy via global tracker to prevent window resize crashes from orphaned charts
+            if (window.myKanakkuCharts[id]) {
+                window.myKanakkuCharts[id].destroy();
+                delete window.myKanakkuCharts[id];
             }
-            return newEl;
+            
+            // 2. Destroy via Chart.js internal registry
+            try {
+                if (typeof Chart !== "undefined") {
+                    var existing = Chart.getChart ? (Chart.getChart(id) || Chart.getChart(canvas)) : null;
+                    if (existing) existing.destroy();
+                    
+                    for (var key in Chart.instances) {
+                        if (Chart.instances[key].canvas && Chart.instances[key].canvas.id === id) {
+                            Chart.instances[key].destroy();
+                        }
+                    }
+                }
+            } catch(e) { console.warn(e); }
+            
+            // 3. Clone canvas to guarantee pristine DOM context
+            var newCanvas = canvas.cloneNode(false);
+            if (canvas.parentNode) {
+                canvas.parentNode.replaceChild(newCanvas, canvas);
+            }
+            
+            var newChart = new Chart(newCanvas, config);
+            window.myKanakkuCharts[id] = newChart;
+            return newChart;
         }
 
         function renderCharts() {
@@ -371,69 +416,60 @@ BEGIN
             }
 
             // 1. Bar Chart
-            var barEl = getCleanCanvas("incomeExpensesChart");
-            if (barEl) {
-                new Chart(barEl, {
-                    type: "bar",
-                    data: {
-                        labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"],
-                        datasets: [
-                            { label: "Income", data: incData, backgroundColor: "#4f46e5", borderRadius: 6, barPercentage: 0.6, categoryPercentage: 0.7 },
-                            { label: "Expenses", data: expData, backgroundColor: "#f97316", borderRadius: 6, barPercentage: 0.6, categoryPercentage: 0.7 }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { position: "top", align: "end", labels: { usePointStyle: true, boxWidth: 10 } } },
-                        scales: { y: { grid: { color: "#f1f5f9" }, ticks: { callback: function(v) { return "₹" + v + "L"; } } }, x: { grid: { display: false } } }
-                    }
-                });
-            }
+            safelyCreateChart("incomeExpensesChart", {
+                type: "bar",
+                data: {
+                    labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"],
+                    datasets: [
+                        { label: "Income", data: incData, backgroundColor: "#4f46e5", borderRadius: 6, barPercentage: 0.6, categoryPercentage: 0.7 },
+                        { label: "Expenses", data: expData, backgroundColor: "#f97316", borderRadius: 6, barPercentage: 0.6, categoryPercentage: 0.7 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: "top", align: "end", labels: { usePointStyle: true, boxWidth: 10 } } },
+                    scales: { y: { grid: { color: "#f1f5f9" }, ticks: { callback: function(v) { return "₹" + v + "L"; } } }, x: { grid: { display: false } } }
+                }
+            });
 
             // 2. Donut Chart
-            var donutEl = getCleanCanvas("expensesDonutChart");
-            if (donutEl) {
-                new Chart(donutEl, {
-                    type: "doughnut",
-                    data: {
-                        labels: ["Vendor Payables", "Vendor Paid", "GST / Tax", "Payroll & Benefits"],
-                        datasets: [{
-                            data: [' || NVL(l_tot_payables, 0) || ', ' || NVL(l_paid_sum, 0) || ', ' || NVL(l_tot_gst, 0) || ', 600000],
-                            backgroundColor: ["#3b82f6", "#10b981", "#f59e0b", "#ec4899"],
-                            borderWidth: 3,
-                            borderColor: "#ffffff"
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        cutout: "70%",
-                        plugins: { legend: { display: false } }
-                    }
-                });
-            }
+            safelyCreateChart("expensesDonutChart", {
+                type: "doughnut",
+                data: {
+                    labels: ["Vendor Payables", "Vendor Paid", "GST / Tax", "Overdue Invoices"],
+                    datasets: [{
+                        data: [' || NVL(l_tot_payables, 0) || ', ' || NVL(l_paid_sum, 0) || ', ' || NVL(l_tot_gst, 0) || ', ' || NVL(l_over_sum, 0) || '],
+                        backgroundColor: ["#3b82f6", "#10b981", "#f59e0b", "#ec4899"],
+                        borderWidth: 3,
+                        borderColor: "#ffffff"
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: "70%",
+                    plugins: { legend: { display: false } }
+                }
+            });
 
             // 3. Line Chart
-            var flowEl = getCleanCanvas("cashFlowChart");
-            if (flowEl) {
-                new Chart(flowEl, {
-                    type: "line",
-                    data: {
-                        labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"],
-                        datasets: [
-                            { label: "Inflow", data: incData, borderColor: "#10b981", backgroundColor: "rgba(16, 185, 129, 0.1)", fill: true, tension: 0.35 },
-                            { label: "Outflow", data: expData, borderColor: "#ef4444", backgroundColor: "rgba(239, 68, 68, 0.05)", fill: true, tension: 0.35 }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { position: "top", align: "end", labels: { usePointStyle: true, boxWidth: 10 } } },
-                        scales: { y: { grid: { color: "#f1f5f9" }, ticks: { callback: function(v) { return "₹" + v + "L"; } } }, x: { grid: { display: false } } }
-                    }
-                });
-            }
+            safelyCreateChart("cashFlowChart", {
+                type: "line",
+                data: {
+                    labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"],
+                    datasets: [
+                        { label: "Inflow", data: incData, borderColor: "#10b981", backgroundColor: "rgba(16, 185, 129, 0.1)", fill: true, tension: 0.35 },
+                        { label: "Outflow", data: expData, borderColor: "#ef4444", backgroundColor: "rgba(239, 68, 68, 0.05)", fill: true, tension: 0.35 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: "top", align: "end", labels: { usePointStyle: true, boxWidth: 10 } } },
+                    scales: { y: { grid: { color: "#f1f5f9" }, ticks: { callback: function(v) { return "₹" + v + "L"; } } }, x: { grid: { display: false } } }
+                }
+            });
         }
 
         // TAB SWITCHING & CONTENT FILTERING

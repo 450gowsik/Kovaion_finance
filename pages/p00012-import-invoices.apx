@@ -10,6 +10,17 @@ page 12 (
     dialog {
         chained: false
     }
+    navigation {
+        warnOnUnsavedChanges: false
+    }
+    javaScript {
+        executeWhenPageLoads:
+            ```javascript
+            if (typeof apex !== "undefined" && apex.page) {
+                apex.page.warnOnUnsavedChanges(false);
+            }
+            ```
+    }
 
     css {
         inline:
@@ -246,165 +257,22 @@ page 12 (
             savedReportMappingIdentifier: 10012001
         }
 
-        column INVOICE_NUMBER (
-            type: plainText
-            heading {
-                heading: "Invoice Number"
-            }
-            layout {
-                sequence: 10
-            }
-            source {
-                dataType: STRING
-            }
-        )
-
-        column VENDOR (
-            type: plainText
-            heading {
-                heading: "Vendor"
-            }
-            layout {
-                sequence: 20
-            }
-            source {
-                dataType: STRING
-            }
-        )
-
-        column INVOICE_DATE (
-            type: plainText
-            heading {
-                heading: "Invoice Date"
-            }
-            layout {
-                sequence: 30
-            }
-            source {
-                dataType: STRING
-            }
-        )
-
-        column DUE_DATE (
-            type: plainText
-            heading {
-                heading: "Due Date"
-            }
-            layout {
-                sequence: 40
-            }
-            source {
-                dataType: STRING
-            }
-        )
-
-        column SUBTOTAL (
-            type: plainText
-            heading {
-                heading: "Subtotal"
-            }
-            layout {
-                sequence: 50
-            }
-            source {
-                dataType: STRING
-            }
-        )
-
-        column TAX_AMOUNT (
-            type: plainText
-            heading {
-                heading: "Tax Amount"
-            }
-            layout {
-                sequence: 60
-            }
-            source {
-                dataType: STRING
-            }
-        )
-
-        column STATUS (
-            type: plainText
-            heading {
-                heading: "Status"
-            }
-            layout {
-                sequence: 70
-            }
-            source {
-                dataType: STRING
-            }
-        )
-
-        column VALIDATION_STATUS (
-            type: plainText
-            heading {
-                heading: "Validation Status"
-            }
-            layout {
-                sequence: 80
-            }
-            source {
-                dataType: STRING
-            }
-        )
-
-        column ERROR_DETAILS (
-            type: plainText
-            heading {
-                heading: "Error Details"
-            }
-            layout {
-                sequence: 90
-            }
-            source {
-                dataType: STRING
-            }
-        )
-
         savedReport primary (
             visibility: primaryDefault
             view {
+                columns: [
+                    INVOICE_NUMBER,
+                    VENDOR,
+                    INVOICE_DATE,
+                    DUE_DATE,
+                    SUBTOTAL,
+                    TAX_AMOUNT,
+                    STATUS,
+                    VALIDATION_STATUS,
+                    ERROR_DETAILS
+                ]
                 rowsPerPage: 50
             }
-
-            displayColumn INVOICE_NUMBER (
-                sequence: 10
-            )
-
-            displayColumn VENDOR (
-                sequence: 20
-            )
-
-            displayColumn INVOICE_DATE (
-                sequence: 30
-            )
-
-            displayColumn DUE_DATE (
-                sequence: 40
-            )
-
-            displayColumn SUBTOTAL (
-                sequence: 50
-            )
-
-            displayColumn TAX_AMOUNT (
-                sequence: 60
-            )
-
-            displayColumn STATUS (
-                sequence: 70
-            )
-
-            displayColumn VALIDATION_STATUS (
-                sequence: 80
-            )
-
-            displayColumn ERROR_DETAILS (
-                sequence: 90
-            )
-
         )
 
     )
@@ -462,6 +330,7 @@ page 12 (
         }
         behavior {
             action: submitPage
+            warnOnUnsavedChanges: doNotCheck
         }
     )
 
@@ -480,6 +349,7 @@ page 12 (
         }
         behavior {
             action: submitPage
+            warnOnUnsavedChanges: doNotCheck
         }
     )
 

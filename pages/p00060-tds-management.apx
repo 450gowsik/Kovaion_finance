@@ -1,0 +1,35 @@
+page 60 (
+    name: "TDS Management"
+    alias: TDS-MANAGEMENT
+    title: "TDS Management - Kovaion Finance"
+    appearance {
+        pageTemplate: @/standard
+        templateOptions: #DEFAULT#
+    }
+    navigation {
+        cursorFocus: doNotFocusCursor
+    }
+
+    region tds-main (
+        name: "TDS Management"
+        type: staticContent
+        source {
+            htmlCode:
+                ```html
+                <div style="padding: 24px; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0;">
+                    <h2 style="font-size: 20px; font-weight: 700; color: #0f172a; margin-top: 0;">TDS Management &amp; Statutory Compliance</h2>
+                    <p style="color: #64748b; font-size: 14px;">Manage Tax Deducted at Source entries, section rates (194C, 194J), and quarterly challan reconciliation.</p>
+                </div>
+                ```
+        }
+        layout {
+            sequence: 10
+            slot: body
+        }
+        appearance {
+            template: @/standard
+            templateOptions: #DEFAULT#
+        }
+    )
+
+)

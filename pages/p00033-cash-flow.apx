@@ -1,0 +1,35 @@
+page 33 (
+    name: "Cash Flow"
+    alias: CASH-FLOW
+    title: "Cash Flow - Kovaion Finance"
+    appearance {
+        pageTemplate: @/standard
+        templateOptions: #DEFAULT#
+    }
+    navigation {
+        cursorFocus: doNotFocusCursor
+    }
+
+    region cash-flow-main (
+        name: "Cash Flow"
+        type: staticContent
+        source {
+            htmlCode:
+                ```html
+                <div style="padding: 24px; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0;">
+                    <h2 style="font-size: 20px; font-weight: 700; color: #0f172a; margin-top: 0;">Cash Flow Ledger</h2>
+                    <p style="color: #64748b; font-size: 14px;">Monitor financial receipts, disbursements, and month-over-month liquidity reserves.</p>
+                </div>
+                ```
+        }
+        layout {
+            sequence: 10
+            slot: body
+        }
+        appearance {
+            template: @/standard
+            templateOptions: #DEFAULT#
+        }
+    )
+
+)

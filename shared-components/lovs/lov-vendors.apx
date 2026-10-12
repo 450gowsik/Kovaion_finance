@@ -1,0 +1,11 @@
+lov lov-vendors (
+    name: LOV_VENDORS
+    source {
+        tableName: KF_VENDORS
+    }
+    columnMapping {
+        return: VENDOR_ID
+        display: VENDOR_NAME
+        defaultSort: VENDOR_NAME
+    }
+)

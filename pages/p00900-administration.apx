@@ -1,0 +1,35 @@
+page 900 (
+    name: Administration
+    alias: ADMINISTRATION
+    title: "Administration - Kovaion Finance"
+    appearance {
+        pageTemplate: @/standard
+        templateOptions: #DEFAULT#
+    }
+    navigation {
+        cursorFocus: doNotFocusCursor
+    }
+
+    region admin-main (
+        name: Administration
+        type: staticContent
+        source {
+            htmlCode:
+                ```html
+                <div style="padding: 24px; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0;">
+                    <h2 style="font-size: 20px; font-weight: 700; color: #0f172a; margin-top: 0;">Administration &amp; System Configuration</h2>
+                    <p style="color: #64748b; font-size: 14px;">User access control, role assignments, audit logs, and global parameter settings.</p>
+                </div>
+                ```
+        }
+        layout {
+            sequence: 10
+            slot: body
+        }
+        appearance {
+            template: @/standard
+            templateOptions: #DEFAULT#
+        }
+    )
+
+)

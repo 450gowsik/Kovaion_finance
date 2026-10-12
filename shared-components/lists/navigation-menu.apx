@@ -1,0 +1,184 @@
+list navigation-menu (
+    name: Navigation Menu
+
+    entry dashboard (
+        label: Dashboard
+        icon {
+            imageIconCssClasses: fa-dashboard
+        }
+        layout {
+            sequence: 10
+        }
+        link {
+            target: {
+                page: 1
+            }
+        }
+    )
+
+    entry invoices (
+        label: Invoices
+        icon {
+            imageIconCssClasses: fa-file-text-o
+        }
+        layout {
+            sequence: 20
+        }
+        link {
+            target: {
+                page: 10
+            }
+        }
+    )
+
+    entry payments (
+        label: Payments
+        icon {
+            imageIconCssClasses: fa-credit-card
+        }
+        layout {
+            sequence: 30
+        }
+        link {
+            target: {
+                page: 50
+            }
+        }
+    )
+
+    entry reports (
+        label: Reports
+        icon {
+            imageIconCssClasses: fa-bar-chart
+        }
+        layout {
+            sequence: 40
+        }
+        link {
+            target: {
+                page: 40
+            }
+        }
+    )
+
+    entry tds-management (
+        label: TDS Management
+        icon {
+            imageIconCssClasses: fa-inr
+        }
+        layout {
+            sequence: 50
+        }
+        link {
+            target: {
+                page: 60
+            }
+        }
+    )
+
+    entry vendors (
+        label: Vendors
+        icon {
+            imageIconCssClasses: fa-users
+        }
+        layout {
+            sequence: 60
+        }
+        link {
+            target: {
+                page: 70
+            }
+        }
+    )
+
+    entry approvals (
+        label: Approvals
+        icon {
+            imageIconCssClasses: fa-check-circle
+        }
+        layout {
+            sequence: 70
+        }
+        link {
+            target: {
+                page: 80
+            }
+        }
+    )
+
+    entry email-invoice-processing (
+        label: Email & Invoice Processing
+        icon {
+            imageIconCssClasses: fa-envelope
+        }
+        layout {
+            sequence: 80
+        }
+        link {
+            target: {
+                page: 20
+            }
+        }
+    )
+
+    entry cash-flow (
+        label: Cash Flow
+        icon {
+            imageIconCssClasses: fa-money
+        }
+        layout {
+            sequence: 90
+        }
+        link {
+            target: {
+                page: 33
+            }
+        }
+    )
+
+    entry notifications (
+        label: Notifications
+        icon {
+            imageIconCssClasses: fa-bell
+        }
+        layout {
+            sequence: 100
+        }
+        link {
+            target: {
+                page: 90
+            }
+        }
+    )
+
+    entry help-support (
+        label: Help & Support
+        icon {
+            imageIconCssClasses: fa-question-circle
+        }
+        layout {
+            sequence: 110
+        }
+        link {
+            target: {
+                page: 100
+            }
+        }
+    )
+
+    entry administration (
+        label: Administration
+        icon {
+            imageIconCssClasses: fa-cogs
+        }
+        layout {
+            sequence: 120
+        }
+        link {
+            target: {
+                page: 900
+            }
+        }
+    )
+
+)

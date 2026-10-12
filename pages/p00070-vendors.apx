@@ -1,0 +1,35 @@
+page 70 (
+    name: Vendors
+    alias: VENDORS
+    title: "Vendors - Kovaion Finance"
+    appearance {
+        pageTemplate: @/standard
+        templateOptions: #DEFAULT#
+    }
+    navigation {
+        cursorFocus: doNotFocusCursor
+    }
+
+    region vendors-main (
+        name: Vendors
+        type: staticContent
+        source {
+            htmlCode:
+                ```html
+                <div style="padding: 24px; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0;">
+                    <h2 style="font-size: 20px; font-weight: 700; color: #0f172a; margin-top: 0;">Vendor Master Management</h2>
+                    <p style="color: #64748b; font-size: 14px;">Maintain vendor profiles, PAN, GSTIN registrations, and banking details.</p>
+                </div>
+                ```
+        }
+        layout {
+            sequence: 10
+            slot: body
+        }
+        appearance {
+            template: @/standard
+            templateOptions: #DEFAULT#
+        }
+    )
+
+)
