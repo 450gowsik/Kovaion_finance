@@ -1,0 +1,415 @@
+/* ==========================================================================
+   KOVAION FINANCE - REGION 5: RULE-BASED FINANCIAL INTELLIGENCE STYLING
+   Location in APEX: Page 1 -> Page Properties -> CSS -> Inline (Append)
+   ========================================================================== */
+
+/* Main Insights Wrapper */
+.sl-insights-wrapper {
+    width: 100% !important;
+    margin-bottom: 24px !important;
+    animation: slFadeIn 0.25s ease-in-out;
+}
+
+@keyframes slFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Header Banner */
+.sl-ai-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 16px 20px !important;
+    margin-bottom: 18px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+}
+
+.sl-ai-title {
+    font-size: 17px !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    margin-bottom: 3px !important;
+}
+
+.sl-ai-subtitle {
+    font-size: 12.5px !important;
+    color: #64748b !important;
+    font-weight: 500 !important;
+    margin-bottom: 10px !important;
+}
+
+.sl-ai-badges {
+    display: flex !important;
+    gap: 8px !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+}
+
+/* Badge Pills */
+.sl-badge-pill {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    padding: 3px 10px !important;
+    border-radius: 9999px !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+}
+
+.sl-badge-green {
+    background: #ecfdf5 !important;
+    color: #047857 !important;
+    border: 1px solid #a7f3d0 !important;
+}
+
+.sl-badge-amber {
+    background: #fffbeb !important;
+    color: #b45309 !important;
+    border: 1px solid #fde68a !important;
+}
+
+.sl-badge-blue {
+    background: #eff6ff !important;
+    color: #1d4ed8 !important;
+    border: 1px solid #bfdbfe !important;
+}
+
+.sl-badge-red {
+    background: #fef2f2 !important;
+    color: #b91c1c !important;
+    border: 1px solid #fecaca !important;
+}
+
+.sl-badge-gray {
+    background: #f8fafc !important;
+    color: #475569 !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+.sl-dot-live {
+    width: 7px !important;
+    height: 7px !important;
+    border-radius: 50% !important;
+    background: #10b981 !important;
+    display: inline-block !important;
+}
+
+.sl-badge-code {
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+    font-family: monospace !important;
+    font-size: 11.5px !important;
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+/* 4-Column Executive Metrics Grid */
+.sl-ai-kpi-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 14px !important;
+    margin-bottom: 18px !important;
+}
+
+.sl-ai-kpi-card {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 14px 16px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+}
+
+.sl-ai-kpi-label {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    color: #64748b !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    margin-bottom: 6px !important;
+}
+
+.sl-ai-kpi-val {
+    font-size: 24px !important;
+    font-weight: 800 !important;
+    line-height: 1.1 !important;
+    margin-bottom: 4px !important;
+}
+
+.sl-ai-kpi-sub {
+    font-size: 11.5px !important;
+    color: #64748b !important;
+    font-weight: 500 !important;
+    margin-bottom: 6px !important;
+}
+
+.sl-ai-kpi-status {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+}
+
+/* 2-Column Deep-Dive Grid */
+.sl-ai-grid-2col {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 16px !important;
+    margin-bottom: 16px !important;
+}
+
+.sl-ai-card {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 18px 20px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+}
+
+.sl-ai-card-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    margin-bottom: 14px !important;
+}
+
+.sl-ai-card-title {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+}
+
+.sl-ai-card-sub {
+    font-size: 12px !important;
+    color: #64748b !important;
+    margin-top: 2px !important;
+}
+
+/* High-Priority Overdue Invoices Table */
+.sl-table-wrap {
+    overflow-x: auto !important;
+}
+
+.sl-ai-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 12.5px !important;
+}
+
+.sl-ai-table th {
+    background: #f8fafc !important;
+    color: #475569 !important;
+    font-weight: 700 !important;
+    font-size: 11px !important;
+    text-transform: uppercase !important;
+    padding: 9px 12px !important;
+    text-align: left !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.sl-ai-table td {
+    padding: 10px 12px !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    color: #1e293b !important;
+}
+
+.sl-ai-table tr:hover td {
+    background: #f8fafc !important;
+}
+
+.sl-action-link {
+    display: inline-block !important;
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    color: #4f46e5 !important;
+    text-decoration: none !important;
+    padding: 4px 8px !important;
+    border-radius: 6px !important;
+    background: #eef2ff !important;
+    transition: all 0.15s ease !important;
+}
+
+.sl-action-link:hover {
+    background: #e0e7ff !important;
+    color: #3730a3 !important;
+}
+
+/* Vendor Concentration Bars */
+.sl-vendor-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+}
+
+.sl-vendor-item {
+    padding: 8px 0 !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+}
+
+.sl-vendor-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    font-size: 12.5px !important;
+    margin-bottom: 6px !important;
+}
+
+.sl-progress-bg {
+    height: 6px !important;
+    background: #f1f5f9 !important;
+    border-radius: 9999px !important;
+    overflow: hidden !important;
+}
+
+.sl-progress-fill {
+    height: 100% !important;
+    background: linear-gradient(90deg, #3b82f6, #6366f1) !important;
+    border-radius: 9999px !important;
+}
+
+.sl-conc-footer {
+    margin-top: 14px !important;
+    padding: 10px 14px !important;
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    font-size: 11.5px !important;
+    color: #475569 !important;
+}
+
+/* Data Quality Disclosures Banner */
+.sl-disclosure-banner {
+    background: #fffbeb !important;
+    border: 1px solid #fde68a !important;
+    border-radius: 12px !important;
+    padding: 16px 20px !important;
+    margin-bottom: 18px !important;
+}
+
+.sl-disclosure-title {
+    font-size: 13.5px !important;
+    font-weight: 800 !important;
+    color: #92400e !important;
+    margin-bottom: 8px !important;
+}
+
+.sl-disclosure-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 14px !important;
+    font-size: 11.5px !important;
+    color: #78350f !important;
+    line-height: 1.5 !important;
+}
+
+.sl-disclosure-item {
+    background: rgba(255, 255, 255, 0.6) !important;
+    padding: 10px 12px !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(251, 191, 36, 0.3) !important;
+}
+
+/* Recommended Next Actions Grid */
+.sl-ai-actions-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 14px !important;
+    margin-bottom: 20px !important;
+}
+
+.sl-ai-action-card {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+}
+
+.sl-action-icon {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 18px !important;
+    margin-bottom: 10px !important;
+}
+
+.sl-action-title {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    margin-bottom: 5px !important;
+}
+
+.sl-action-desc {
+    font-size: 11.5px !important;
+    color: #64748b !important;
+    line-height: 1.4 !important;
+    margin-bottom: 14px !important;
+    flex-grow: 1 !important;
+}
+
+.sl-btn-action {
+    display: inline-block !important;
+    text-align: center !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    padding: 8px 12px !important;
+    border-radius: 8px !important;
+    background: #0f172a !important;
+    color: #ffffff !important;
+    text-decoration: none !important;
+    transition: all 0.15s ease !important;
+}
+
+.sl-btn-action:hover {
+    background: #334155 !important;
+    color: #ffffff !important;
+}
+
+/* Empty States */
+.sl-empty-state {
+    text-align: center !important;
+    padding: 24px 16px !important;
+    color: #64748b !important;
+}
+
+.sl-empty-icon {
+    font-size: 28px !important;
+    color: #10b981 !important;
+    margin-bottom: 6px !important;
+}
+
+.sl-empty-title {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    margin-bottom: 4px !important;
+}
+
+.sl-empty-desc {
+    font-size: 11.5px !important;
+}
+
+/* Responsive Overrides */
+@media (max-width: 1100px) {
+    .sl-ai-kpi-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .sl-ai-grid-2col { grid-template-columns: 1fr !important; }
+    .sl-disclosure-grid { grid-template-columns: 1fr !important; }
+    .sl-ai-actions-grid { grid-template-columns: 1fr !important; }
+}
+
+@media (max-width: 640px) {
+    .sl-ai-kpi-grid { grid-template-columns: 1fr !important; }
+    .sl-ai-header { flex-direction: column !important; align-items: flex-start !important; gap: 10px !important; }
+}

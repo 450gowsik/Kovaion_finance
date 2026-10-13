@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Chart Test</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body style="background:#f8fafc;padding:20px;">
+<div style="width: 600px; height: 240px; position: relative;">
+    <canvas id="incomeExpensesChart"></canvas>
+</div>
+<div style="width: 300px; height: 170px; position: relative; margin-top: 20px;">
+    <canvas id="expensesDonutChart"></canvas>
+</div>
+<div style="width: 600px; height: 200px; position: relative; margin-top: 20px;">
+    <canvas id="cashFlowChart"></canvas>
+</div>
+<div id="log" style="margin-top:20px;font-family:sans-serif;"></div>
+
+<script>
+window.onerror = function(msg, url, lineNo) {
+    document.getElementById('log').innerHTML += '<p style="color:red">ERROR: ' + msg + ' (line ' + lineNo + ')</p>';
+};
+
+try {
+    var exp = [11.2,12.5,13.4,14.1,14.8,15.2,16.0,17.2,18.15,18.4,19.5,20.8];
+    var inc = [14.8,16.2,17.5,18.4,19.1,19.8,21.0,22.5,23.8,24.2,25.1,26.5];
+    var lbl = ["Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar"];
+    
+    var sOpt = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { position: "top", align: "end", labels: { usePointStyle: true, boxWidth: 10 } }
+        },
+        scales: {
+            y: { grid: { color: "#f1f5f9" }, ticks: { callback: function(v){ return "₹" + v + "L"; } } },
+            x: { grid: { display: false }, ticks: { color: "#64748b" } }
+        }
+    };
+
+    var lOpt = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { position: "top", align: "end", labels: { usePointStyle: true, boxWidth: 10 } }
+        },
+        scales: {
+            y: { grid: { color: "#f8fafc" }, ticks: { callback: function(v){ return "₹" + v + "L"; } } },
+            x: { grid: { display: false }, ticks: { color: "#64748b" } }
+        }
+    };
+
+    window.myKanakkuCharts = window.myKanakkuCharts || {};
+
+    function scChart(id, cfg) {
+        var c = document.getElementById(id);
+        if (!c) return null;
+        if (window.myKanakkuCharts[id]) {
+            try { window.myKanakkuCharts[id].destroy(); } catch(e) {}
+            delete window.myKanakkuCharts[id];
+        }
+        try {
+            if (typeof Chart !== "undefined") {
+                var ex = Chart.getChart ? (Chart.getChart(id) || Chart.getChart(c)) : null;
+                if (ex) ex.destroy();
+                for (var k in Chart.instances) {
+                    if (Chart.instances[k] && Chart.instances[k].canvas && (Chart.instances[k].canvas.id === id || Chart.instances[k].canvas === c)) {
+                        Chart.instances[k].destroy();
+                    }
+                }
+            }
+        } catch(e) {}
+        try {
+            var nc = c.cloneNode(false);
+            if (c.parentNode) c.parentNode.replaceChild(nc, c);
+            var ch = new Chart(nc, cfg);
+            window.myKanakkuCharts[id] = ch;
+            return ch;
+        } catch(err) {
+            console.warn("Chart " + id + " err:", err);
+            return null;
+        }
+    }
+
+    // 1. Bar Chart
+    var b = scChart("incomeExpensesChart", {
+        type: "bar",
+        data: {
+            labels: lbl,
+            datasets: [
+                { label: "Income", data: inc, backgroundColor: "#4f46e5", borderRadius: 6, barPercentage: 0.6, categoryPercentage: 0.7 },
+                { label: "Expenses", data: exp, backgroundColor: "#f97316", borderRadius: 6, barPercentage: 0.6, categoryPercentage: 0.7 }
+            ]
+        },
+        options: sOpt
+    });
+    if (b) document.getElementById('log').innerHTML += '<p style="color:green">✓ Bar Chart initialized</p>';
+
+    // 2. Donut Chart
+    var d = scChart("expensesDonutChart", {
+        type: "doughnut",
+        data: {
+            labels: ["Vendor Payables", "Vendor Paid", "GST / Tax", "Overdue Invoices"],
+            datasets: [{
+                data: [765912, 19219028, 9476223, 0],
+                backgroundColor: ["#3b82f6", "#10b981", "#f59e0b", "#ec4899"],
+                borderWidth: 3,
+                borderColor: "#fff"
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: "70%",
+            plugins: { legend: { display: false } }
+        }
+    });
+    if (d) document.getElementById('log').innerHTML += '<p style="color:green">✓ Donut Chart initialized</p>';
+
+    // 3. Line Chart
+    var l = scChart("cashFlowChart", {
+        type: "line",
+        data: {
+            labels: lbl,
+            datasets: [
+                { label: "Inflow", data: inc, borderColor: "#10b981", backgroundColor: "rgba(16,185,129,0.1)", fill: true, tension: 0.35 },
+                { label: "Outflow", data: exp, borderColor: "#ef4444", backgroundColor: "rgba(239,68,68,0.05)", fill: true, tension: 0.35 }
+            ]
+        },
+        options: lOpt
+    });
+    if (l) document.getElementById('log').innerHTML += '<p style="color:green">✓ Line Chart initialized</p>';
+
+} catch(e) {
+    document.getElementById('log').innerHTML += '<p style="color:red">CATCH: ' + e.message + '</p>';
+}
+</script>
+</body>
+</html>
